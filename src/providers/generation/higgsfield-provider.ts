@@ -1,0 +1,30 @@
+import { ProviderNotConfiguredError } from "../errors";
+import type { GenerationProvider, GenerationRequest, GenerationResult } from "./types";
+
+/**
+ * Placeholder for the verified Higgsfield API integration.
+ * Credentials come from the server environment only. Endpoints and model identifiers are
+ * intentionally absent until they are confirmed against the official API documentation.
+ */
+export class HiggsfieldProvider implements GenerationProvider {
+  readonly id = "higgsfield" as const;
+
+  constructor(private readonly apiKey: string | undefined = process.env.HIGGSFIELD_API_KEY) {}
+
+  private ensure(): never {
+    if (!this.apiKey) throw new ProviderNotConfiguredError("higgsfield");
+    throw new ProviderNotConfiguredError("higgsfield (implementation pending)");
+  }
+
+  async generateReality(_req: GenerationRequest): Promise<GenerationResult> {
+    return this.ensure();
+  }
+
+  async generateArchviz(_req: GenerationRequest): Promise<GenerationResult> {
+    return this.ensure();
+  }
+
+  async generateMotion(_req: GenerationRequest): Promise<GenerationResult> {
+    return this.ensure();
+  }
+}
