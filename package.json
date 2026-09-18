@@ -9,6 +9,7 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit -p .",
     "test:geometry": "tsx scripts/tests/geometry.test.ts",
+    "test:e2e": "node scripts/tests/studio-flow.test.mjs",
     "demo:assets": "tsx scripts/demo-assets/render.ts"
   },
   "dependencies": {

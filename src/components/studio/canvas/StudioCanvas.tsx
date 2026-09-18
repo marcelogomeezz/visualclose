@@ -1,28 +1,32 @@
 "use client";
 
 import { useState } from "react";
-import { useProject } from "@/state/project-store";
-import { ui, useUI } from "@/state/ui-store";
+import { actions, useProject } from "@/state/project-store";
+import { ui, useUI, MODE_LABELS, MODE_COPY } from "@/state/ui-store";
 import { originalOutput, useDisplayedOutput, usePlacementSolve } from "@/state/derived";
-import { actions } from "@/state/project-store";
 import type { NormalizedPoint } from "@/core/types";
+import { downloadAsset } from "@/lib/image";
+import { outputLabel } from "@/lib/format";
 import { PhotoViewport } from "./PhotoViewport";
-import { ModeBar } from "./ModeBar";
-import { VisualizeButton } from "./VisualizeButton";
 import { GenerationOverlay } from "./GenerationOverlay";
 import { CompareSlider } from "./CompareSlider";
-import { TechnicalFrame } from "./TechnicalFrame";
+import { RealPlanFrame } from "./RealPlanFrame";
 import { FitLayer } from "../fit/FitLayer";
 import { FootprintHandles } from "../fit/FootprintHandles";
+import { StickerHandles } from "../fit/StickerHandles";
 import { MeasureOverlay } from "../fit/MeasureOverlay";
 import { DropZone } from "../dock/DropZone";
+import { Icon } from "@/components/ui/icons";
 
 export function StudioCanvas() {
   const project = useProject();
   const mode = useUI((s) => s.mode);
   const compare = useUI((s) => s.compare);
   const pickTool = useUI((s) => s.pickTool);
-  const viewportZoom = useUI((s) => s.viewport.zoom);
+  const adjustTool = useUI((s) => s.adjustTool);
+  const advanced = useUI((s) => s.advancedAdjust);
+  const zoom = useUI((s) => s.viewport.zoom);
+  const generating = useUI((s) => s.generating);
   const solve = usePlacementSolve();
   const displayed = useDisplayedOutput();
   const [pendingA, setPendingA] = useState<NormalizedPoint | null>(null);
@@ -36,16 +40,10 @@ export function StudioCanvas() {
       setPendingA(p);
       ui.setPickTool("measure-b");
     } else if (pickTool === "measure-b" && pendingA) {
-      actions.setReferenceMeasurement({
-        a: pendingA,
-        b: p,
-        distance: project.referenceMeasurement?.distance ?? 1,
-        units: project.referenceMeasurement?.units ?? project.dimensions.units,
-        label: project.referenceMeasurement?.label,
-      });
+      actions.setReferenceMeasurement({ a: pendingA, b: p, distance: project.referenceMeasurement?.distance ?? 1, units: project.referenceMeasurement?.units ?? project.dimensions.units });
       setPendingA(null);
       ui.setPickTool(null);
-      ui.toast("Enter the known distance");
+      ui.toast("Introduce la distancia conocida");
     } else if (pickTool === "wall-anchor") {
       actions.setWallAnchor(p);
       ui.setPickTool(null);
@@ -53,29 +51,40 @@ export function StudioCanvas() {
   };
 
   const original = originalOutput(project);
-  const visualOutput = mode === "REALITY" || mode === "ARCHVIZ" ? displayed : null;
+  const isVisual = mode === "REALITY" || mode === "ARCHVIZ";
+  const visualOutput = isVisual ? displayed : null;
   const canCompare = !!visualOutput && !!original && visualOutput.registered;
+  const downloadable = (isVisual && visualOutput) || (mode === "TECHNICAL" && displayed) ? displayed : null;
 
   return (
-    <main className="relative bg-graphite-0 min-h-0 overflow-hidden">
+    <main className="relative bg-graphite-0 h-full min-h-0 overflow-hidden">
       {!space ? (
-        <div className="absolute inset-0 flex items-center justify-center p-10">
+        <div className="absolute inset-0 flex items-center justify-center p-8">
           <DropZone onFiles={(f) => void actions.setSpace(f[0])} className="w-full max-w-[560px]">
-            <div className="py-16 text-center">
-              <div className="t-editorial text-[34px] text-ivory mb-3">Start with the real space.</div>
-              <div className="text-[12px] text-warm-grey">Drop one environment photograph here, or load the demo project.</div>
+            <div className="py-14 text-center">
+              <div className="t-editorial text-[30px] md:text-[36px] text-ivory mb-3">Empieza con tu espacio real.</div>
+              <div className="text-[12px] text-warm-grey">Arrastra una foto de tu espacio aquí.</div>
             </div>
           </DropZone>
+          <button
+            type="button"
+            className="absolute bottom-6 t-label hover:text-ivory transition-colors"
+            onClick={() => {
+              actions.loadDemoProject();
+              ui.resetViewport();
+            }}
+          >
+            o carga la demo
+          </button>
         </div>
       ) : (
         <PhotoViewport aspect={space.width / space.height} interactive={!compare} onStageClick={onStageClick} className={pickTool ? "cursor-crosshair" : ""}>
           {(stage, toNormalized) => (
             <>
-              {/* Base photograph or output */}
-              {mode === "REALITY" || mode === "ARCHVIZ" ? (
+              {isVisual ? (
                 visualOutput ? (
                   compare && canCompare && original ? (
-                    <CompareSlider beforeUrl={original.asset.url} afterUrl={visualOutput.asset.url} afterLabel={mode} />
+                    <CompareSlider beforeUrl={original.asset.url} afterUrl={visualOutput.asset.url} beforeLabel="Antes" afterLabel="Después" />
                   ) : (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img key={visualOutput.id} src={visualOutput.asset.url} alt="" className="absolute inset-0 w-full h-full vc-fade-in" draggable={false} />
@@ -83,13 +92,15 @@ export function StudioCanvas() {
                 ) : (
                   <>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={space.asset.url} alt="" className="absolute inset-0 w-full h-full opacity-60" draggable={false} />
-                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                      <div className="text-center">
-                        <div className="t-label-strong mb-1">No {mode} output yet</div>
-                        <div className="text-[11px] text-warm-grey">Press VISUALIZE.</div>
+                    <img src={space.asset.url} alt="" className="absolute inset-0 w-full h-full opacity-55" draggable={false} />
+                    {!generating && (
+                      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                        <div className="text-center bg-graphite-0/55 px-6 py-4">
+                          <div className="t-label-strong mb-1">Aún no hay {MODE_LABELS[mode]}</div>
+                          <div className="text-[11px] text-warm-grey">Pulsa VISUALIZAR ✦</div>
+                        </div>
                       </div>
-                    </div>
+                    )}
                   </>
                 )
               ) : mode === "MOTION" ? (
@@ -98,8 +109,8 @@ export function StudioCanvas() {
                   <img src={space.asset.url} alt="" className="absolute inset-0 w-full h-full opacity-40" draggable={false} />
                   <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                     <div className="border border-line-strong px-8 py-6 text-center bg-graphite-0/50">
-                      <div className="t-label-strong mb-1">Motion · Experimental</div>
-                      <div className="text-[11px] text-warm-grey">Coming later. Video generation slot reserved for the Higgsfield adapter.</div>
+                      <div className="t-label-strong mb-1">Movimiento</div>
+                      <div className="text-[11px] text-warm-grey">Próximamente.</div>
                     </div>
                   </div>
                 </>
@@ -108,55 +119,66 @@ export function StudioCanvas() {
                 <img src={space.asset.url} alt="" className="absolute inset-0 w-full h-full" draggable={false} />
               )}
 
-              {/* 3D placement layer */}
               {(mode === "FIT" || mode === "TECHNICAL") && <FitLayer solve={solve} dimensions={project.dimensions} zoom={stage.zoom} showLabels />}
-
-              {/* Measurement & wall anchor */}
-              {(mode === "ORIGINAL" || mode === "FIT" || mode === "TECHNICAL") && (
+              {mode === "FIT" && advanced && (
                 <MeasureOverlay stage={stage} measurement={project.referenceMeasurement} pending={pendingA} wallAnchor={project.placement.wallAnchor} pickTool={pickTool} />
               )}
-
-              {/* Anchor handles */}
-              {mode === "FIT" && !pickTool && (
-                <FootprintHandles footprint={project.placement.footprint} solve={solve} stage={stage} toNormalized={toNormalized} locked={project.placement.locked} />
+              {mode === "FIT" && !pickTool && !advanced && (
+                <StickerHandles footprint={project.placement.footprint} dimensions={project.dimensions} solve={solve} stage={stage} tool={adjustTool} toNormalized={toNormalized} />
+              )}
+              {mode === "FIT" && !pickTool && advanced && (
+                <FootprintHandles footprint={project.placement.footprint} solve={solve} stage={stage} toNormalized={toNormalized} locked={false} />
               )}
             </>
           )}
         </PhotoViewport>
       )}
 
-      {space && mode === "TECHNICAL" && <TechnicalFrame project={project} />}
+      {space && mode === "TECHNICAL" && <RealPlanFrame project={project} />}
+      {space && mode !== "TECHNICAL" && !generating && (
+        <div className="absolute top-4 left-5 z-20 pointer-events-none">
+          <span className="t-label-strong bg-graphite-0/60 px-2 py-1">{MODE_LABELS[mode]}</span>
+          <span className="ml-2 text-[11px] text-warm-grey hidden md:inline">{MODE_COPY[mode]}</span>
+        </div>
+      )}
       {space && mode === "FIT" && !solve && (
-        <div className="absolute bottom-5 left-5 z-20 text-[11px] text-champagne bg-graphite-0/70 px-3 py-1.5 border border-line">Anchors are degenerate. Move them apart to solve the placement.</div>
+        <div className="absolute bottom-5 left-5 z-20 text-[11px] text-champagne bg-graphite-0/70 px-3 py-1.5 border border-line">Las esquinas están alineadas. Sepáralas para colocar el producto.</div>
       )}
       {space && pickTool && (
         <div className="absolute bottom-5 left-5 z-20 text-[11px] text-ivory bg-graphite-0/70 px-3 py-1.5 border border-line">
-          {pickTool === "measure-a" ? "Click Point A on the photograph" : pickTool === "measure-b" ? "Click Point B" : "Click the wall line where the product attaches"}
-          <span className="text-warm-grey"> · Esc to cancel</span>
+          {pickTool === "measure-a" ? "Marca el punto A en la foto" : pickTool === "measure-b" ? "Marca el punto B" : "Marca la línea de pared"}
+          <span className="text-warm-grey"> · Esc para cancelar</span>
         </div>
       )}
-      {space && viewportZoom > 1 && !pickTool && (
-        <div className="absolute bottom-5 left-5 z-20 t-mono text-[10px] text-warm-grey bg-graphite-0/60 px-2 py-1">{Math.round(viewportZoom * 100)}% · double-click to reset</div>
+      {space && zoom > 1 && !pickTool && (
+        <div className="absolute bottom-5 left-5 z-20 t-mono text-[10px] text-warm-grey bg-graphite-0/60 px-2 py-1">{Math.round(zoom * 100)}% · doble clic para volver</div>
       )}
 
-      <ModeBar disabled={!space} />
-      {space && (mode === "REALITY" || mode === "ARCHVIZ") && visualOutput && (
+      {space && (isVisual || mode === "TECHNICAL") && (
         <div className="absolute top-4 right-5 z-20 flex items-center gap-2">
-          {canCompare ? (
+          {isVisual && visualOutput && canCompare && (
             <button
               type="button"
               onClick={() => ui.setCompare(!compare)}
-              className={`h-7 px-3 text-[10.5px] tracking-[0.14em] uppercase border transition-colors ${compare ? "bg-ivory text-graphite-0 border-ivory" : "text-ivory border-line-strong hover:bg-graphite-3"}`}
+              className={`h-8 px-3 text-[10.5px] tracking-[0.14em] uppercase border transition-colors ${compare ? "bg-ivory text-graphite-0 border-ivory" : "text-ivory border-line-strong bg-graphite-0/60 hover:bg-graphite-3"}`}
             >
-              {compare ? "Exit compare" : "Before / After"}
+              {compare ? "Salir" : "Antes / Después"}
             </button>
-          ) : (
-            <span className="t-label bg-graphite-0/60 px-2 py-1">Not registered to this space</span>
+          )}
+          {isVisual && visualOutput && !canCompare && <span className="t-label bg-graphite-0/60 px-2 py-1">Resultado de muestra · no alineado con tu foto</span>}
+          {downloadable && (
+            <button
+              type="button"
+              title="Descargar"
+              onClick={() => void downloadAsset(downloadable.asset.url, `${outputLabel(downloadable.type, downloadable.index).toLowerCase().replace(/\s+/g, "-")}.${downloadable.asset.mime === "image/png" ? "png" : "jpg"}`)}
+              className="h-8 w-8 flex items-center justify-center border border-line-strong bg-graphite-0/60 text-ivory hover:bg-graphite-3 transition-colors"
+            >
+              <Icon.Download />
+            </button>
           )}
         </div>
       )}
       <GenerationOverlay />
-      <VisualizeButton />
     </main>
   );
 }

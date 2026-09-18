@@ -37,8 +37,12 @@ export function PresentMode() {
   const idleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const reality = useMemo(() => [...(project?.outputs ?? [])].reverse().find((o) => o.type === "REALITY" && o.registered) ?? null, [project?.outputs]);
-  const archviz = useMemo(() => [...(project?.outputs ?? [])].reverse().find((o) => o.type === "ARCHVIZ" && o.registered) ?? null, [project?.outputs]);
-  const focus = useMemo(() => (project ? footprintCenter(project.placement.footprint) : { x: 0.5, y: 0.5 }), [project]);
+  const focus = useMemo(() => {
+    if (!project) return { x: 0.5, y: 0.5 };
+    const c = footprintCenter(project.placement.footprint);
+    // Bias upwards so the product's height survives portrait crops.
+    return { x: c.x, y: Math.max(0.3, c.y - 0.16) };
+  }, [project]);
 
   // Stage sizing: fit the aspect inside the viewport.
   useLayoutEffect(() => {
@@ -87,7 +91,6 @@ export function PresentMode() {
       tl.to(el, { autoAlpha: 0, duration: 0.7, ease: EASE.inOut }, caps.length ? "<0.1" : ">");
     };
 
-    show("intro", 1.6);
     show("space", 3.2, (t, el) => {
       const img = el.querySelector("img");
       if (img) t.fromTo(img, { scale: 1 }, { scale: 1.06, duration: 6.5, ease: "none", transformOrigin: `${focus.x * 100}% ${focus.y * 100}%` }, "<-1");
@@ -105,7 +108,6 @@ export function PresentMode() {
         const after = el.querySelector<HTMLElement>("[data-after]");
         if (after) t.fromTo(after, { clipPath: "inset(0 100% 0 0)" }, { clipPath: "inset(0 0% 0 0)", duration: 2.4, ease: EASE.inOut }, "<0.4");
       });
-      if (archviz) show("archviz", 3);
       show("compare", 2.2, (t, el) => {
         const after = el.querySelector<HTMLElement>("[data-after]");
         const line = el.querySelector<HTMLElement>("[data-line]");
@@ -129,7 +131,7 @@ export function PresentMode() {
       tlRef.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [aspect, project?.id, reality?.id, archviz?.id, stageSize.w]);
+  }, [aspect, project?.id, reality?.id, stageSize.w]);
 
   const togglePlay = () => {
     const tl = tlRef.current;
@@ -183,10 +185,10 @@ export function PresentMode() {
   if (!project?.space) {
     return (
       <div className="fixed inset-0 z-50 bg-graphite-0 flex flex-col items-center justify-center gap-4">
-        <span className="t-label-strong">Nothing to present yet</span>
-        <span className="text-[11px] text-warm-grey">Add a space photograph first.</span>
+        <span className="t-label-strong">Nada que presentar todavía</span>
+        <span className="text-[11px] text-warm-grey">Añade primero la foto de tu espacio.</span>
         <button type="button" className="t-label hover:text-ivory" onClick={() => ui.exitPresent()}>
-          Exit
+          Salir
         </button>
       </div>
     );
@@ -205,13 +207,13 @@ export function PresentMode() {
       <div className={`absolute top-0 inset-x-0 h-12 px-4 flex items-center justify-between transition-opacity duration-500 z-10 ${controlsVisible ? "opacity-100" : "opacity-0 pointer-events-none"}`}>
         <div className="flex items-center gap-3">
           <span className="text-[11px] tracking-[0.3em] text-ivory">VISUALCLOSE</span>
-          <span className="t-label">Present</span>
+          <span className="t-label">Presentar</span>
         </div>
         <div className="flex items-center gap-3">
           <Segmented value={aspect} options={ASPECTS} onChange={(a) => ui.setPresentAspect(a)} />
           <input
             className="vc-input !w-[180px] !py-1"
-            placeholder="Prospect company"
+            placeholder="Empresa del cliente"
             value={presentation.prospectName}
             onChange={(e) => actions.setPresentation({ prospectName: e.target.value })}
           />
@@ -239,25 +241,10 @@ export function PresentMode() {
         style={{ width: stageSize.w, height: stageSize.h, ["--u" as string]: `${u}px` }}
         onClick={togglePlay}
       >
-        {/* INTRO */}
-        <div data-frame="intro" className="absolute inset-0 flex flex-col items-center justify-center text-center">
-          <div data-caption className="text-ivory" style={{ fontSize: "calc(var(--u) * 1.1)", letterSpacing: "0.38em" }}>
-            VISUALCLOSE
-          </div>
-          {prospect && (
-            <div data-caption className="t-editorial text-ivory mt-[calc(var(--u)*2)]" style={{ fontSize: "calc(var(--u) * 4.2)" }}>
-              {prospect}
-            </div>
-          )}
-          <div data-caption className="text-warm-grey mt-[calc(var(--u)*2)]" style={{ fontSize: "calc(var(--u) * 1.2)", letterSpacing: "0.2em" }}>
-            {productPack.name.toUpperCase()}
-          </div>
-        </div>
-
         {/* SPACE */}
         <div data-frame="space" className="absolute inset-0">
           <CoverImage src={space.asset.url} width={space.width} height={space.height} focus={focus} />
-          <Caption kicker="The space" title={project.name} aspect={aspect} />
+          <Caption kicker="Real space" title={project.name} aspect={aspect} />
         </div>
 
         {/* REFERENCES */}
@@ -266,7 +253,7 @@ export function PresentMode() {
             <div className={`absolute inset-0 flex gap-[calc(var(--u)*3)] p-[calc(var(--u)*5)] ${aspect === "16:9" ? "flex-row items-center" : "flex-col"}`}>
               <div className={`${aspect === "16:9" ? "w-[36%]" : "w-full"} shrink-0`}>
                 <div data-caption className="t-label" style={{ fontSize: "calc(var(--u) * 1.05)" }}>
-                  The product
+                  Real product
                 </div>
                 <div data-caption className="t-editorial text-ivory mt-[calc(var(--u)*1.2)]" style={{ fontSize: `calc(var(--u) * ${aspect === "16:9" ? 4.4 : 5.4})` }}>
                   {productPack.name}
@@ -296,7 +283,7 @@ export function PresentMode() {
         <div data-frame="dimensions" className="absolute inset-0 bg-graphite-1">
           <div className="absolute inset-0 p-[calc(var(--u)*6)] flex flex-col justify-center">
             <div data-caption className="t-label" style={{ fontSize: "calc(var(--u) * 1.05)" }}>
-              Configured dimensions
+              Real dimensions
             </div>
             <div data-caption className="t-editorial t-mono text-ivory mt-[calc(var(--u)*2)]" style={{ fontSize: `calc(var(--u) * ${aspect === "9:16" ? 5.6 : 7.2})`, letterSpacing: "-0.02em" }}>
               {aspect === "9:16" ? (
@@ -345,7 +332,7 @@ export function PresentMode() {
               focus={focus}
               overlay={(t) => <VolumeSvg solve={solve} dimensions={dimensions} width={space.width} height={space.height} t={t} />}
             />
-            <Caption kicker="Technical placement" title={dims} sub={TECHNICAL_NOTE} aspect={aspect} />
+            <Caption kicker="Real plan" title={dims} sub={TECHNICAL_NOTE} aspect={aspect} />
           </div>
         )}
 
@@ -356,15 +343,7 @@ export function PresentMode() {
             <div data-after className="absolute inset-0">
               <CoverImage src={reality.asset.url} width={space.width} height={space.height} focus={focus} />
             </div>
-            <Caption kicker="Reality" title="As if it were already installed." aspect={aspect} />
-          </div>
-        )}
-
-        {/* ARCHVIZ */}
-        {reality && archviz && (
-          <div data-frame="archviz" className="absolute inset-0">
-            <CoverImage src={archviz.asset.url} width={space.width} height={space.height} focus={focus} />
-            <Caption kicker="Archviz" title="The architectural vision." aspect={aspect} />
+            <Caption kicker="Reality" title="See it before it exists." aspect={aspect} />
           </div>
         )}
 
@@ -386,8 +365,13 @@ export function PresentMode() {
         )}
 
         {/* BRAND */}
-        <div data-frame="brand" className="absolute inset-0 bg-graphite-0 flex items-center justify-center">
-          <div className={`flex items-center ${aspect === "9:16" ? "flex-col gap-[calc(var(--u)*4)]" : "flex-row gap-[calc(var(--u)*5)]"}`}>
+        <div data-frame="brand" className="absolute inset-0 bg-graphite-0 flex flex-col items-center justify-center gap-[calc(var(--u)*5)]">
+          <div data-caption className="t-editorial text-ivory text-center" style={{ fontSize: `calc(var(--u) * ${aspect === "9:16" ? 7 : 5.6})` }}>
+            SEE IT.
+            <br />
+            BEFORE IT EXISTS.
+          </div>
+          <div className={`flex items-center ${aspect === "9:16" ? "flex-col gap-[calc(var(--u)*3)]" : "flex-row gap-[calc(var(--u)*4)]"}`}>
             {(prospect || presentation.prospectLogo) && (
               <>
                 <div data-caption className="flex items-center justify-center">
@@ -395,17 +379,17 @@ export function PresentMode() {
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={presentation.prospectLogo.url} alt="" style={{ maxHeight: "calc(var(--u) * 10)", maxWidth: "calc(var(--u) * 30)" }} className="object-contain" />
                   ) : (
-                    <span className="t-editorial text-ivory" style={{ fontSize: "calc(var(--u) * 4)" }}>
+                    <span className="t-editorial text-ivory" style={{ fontSize: "calc(var(--u) * 2.6)" }}>
                       {prospect}
                     </span>
                   )}
                 </div>
-                <div data-caption className="text-warm-grey" style={{ fontSize: "calc(var(--u) * 2.4)" }}>
+                <div data-caption className="text-warm-grey" style={{ fontSize: "calc(var(--u) * 1.8)" }}>
                   ×
                 </div>
               </>
             )}
-            <div data-caption className="text-ivory" style={{ fontSize: "calc(var(--u) * 2.2)", letterSpacing: "0.38em" }}>
+            <div data-caption className="text-ivory" style={{ fontSize: "calc(var(--u) * 1.6)", letterSpacing: "0.38em" }}>
               VISUALCLOSE
             </div>
           </div>

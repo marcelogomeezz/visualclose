@@ -1,6 +1,6 @@
 import { lookAtCamera } from "../../src/core/geometry/synthetic";
 import { project, rectangleCorners, solveCamera, projectVolume, unprojectToGround, estimateFovDeg } from "../../src/core/geometry/camera";
-import { reprojectRectangle, rotateFootprint, translateFootprintOnGround, groundDistance } from "../../src/core/geometry/footprint";
+import { reprojectRectangle, rotateFootprint, translateFootprintOnGround, groundDistance, resizeFromCorner, heightFromPointer, pointInFootprint } from "../../src/core/geometry/footprint";
 import type { Footprint } from "../../src/core/types/project";
 
 function assert(cond: boolean, msg: string) {
@@ -65,3 +65,17 @@ const para: Footprint = { FL: { x: 0.3, y: 0.8 }, FR: { x: 0.7, y: 0.8 }, BR: { 
 assert(estimateFovDeg(para, 4, 4, aspect) === null, "parallelogram → no lens estimate");
 const ps = solveCamera({ footprint: para, width: 4, depth: 4, aspect, lens: { fovDeg: 50 } });
 assert(!!ps, "parallelogram still solves with explicit fov");
+
+// Sticker-style handles
+if (solved) {
+  // Drag FR onto the projection of world point (3.5, 0, 2) → width 6, depth 4 (opposite corner BL fixed at (-2.5, -2))
+  const target = project(solved, [3.5, 0, 2]);
+  const r = target && resizeFromCorner(solved, "FR", target, W, D);
+  assert(!!r && Math.abs(r.width - 6) < 1e-3 && Math.abs(r.depth - 4) < 1e-3, `resizeFromCorner FR → ${r?.width.toFixed(3)} × ${r?.depth.toFixed(3)}`);
+  assert(!!r && Math.hypot(r.footprint.BL.x - fp.BL.x, r.footprint.BL.y - fp.BL.y) < 1e-6, "resizeFromCorner keeps the opposite corner fixed");
+  const hp = project(solved, [0, 3.2, D / 2]);
+  const h = hp && heightFromPointer(solved, D, hp);
+  assert(h !== null && h !== undefined && Math.abs(h - 3.2) < 1e-3, `heightFromPointer recovers 3.2 (${h?.toFixed(4)})`);
+  const c = { x: (fp.FL.x + fp.BR.x) / 2, y: (fp.FL.y + fp.BR.y) / 2 };
+  assert(pointInFootprint(fp, c) && !pointInFootprint(fp, { x: 0.02, y: 0.02 }), "pointInFootprint centre in, corner out");
+}

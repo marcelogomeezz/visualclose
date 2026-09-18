@@ -4,16 +4,28 @@ import type { PresentAspect } from "@/core/types";
 export type ViewMode = "ORIGINAL" | "FIT" | "TECHNICAL" | "REALITY" | "ARCHVIZ" | "MOTION";
 export const VIEW_MODES: ViewMode[] = ["ORIGINAL", "FIT", "TECHNICAL", "REALITY", "ARCHVIZ", "MOTION"];
 
+/** Normal Studio labels (Spanish). Internal mode names stay English for persistence and code. */
+export const MODE_LABELS: Record<ViewMode, string> = {
+  ORIGINAL: "ORIGINAL",
+  FIT: "AJUSTAR",
+  TECHNICAL: "REAL PLAN",
+  REALITY: "REALIDAD",
+  ARCHVIZ: "ARQUITECTURA",
+  MOTION: "MOVIMIENTO",
+};
+
 export const MODE_COPY: Record<ViewMode, string> = {
-  ORIGINAL: "The real space, untouched.",
-  FIT: "Place the volume. Set exact dimensions.",
-  TECHNICAL: "See placement and dimensions.",
-  REALITY: "See it as if it were already installed.",
-  ARCHVIZ: "See the architectural vision.",
-  MOTION: "See the transformation in motion.",
+  ORIGINAL: "Tu espacio, tal cual es.",
+  FIT: "Coloca el producto en el espacio.",
+  TECHNICAL: "La foto real con medidas y colocación.",
+  REALITY: "El producto integrado en tu espacio.",
+  ARCHVIZ: "Presentación arquitectónica.",
+  MOTION: "Próximamente.",
 };
 
 export type PickTool = null | "measure-a" | "measure-b" | "wall-anchor";
+export type AdjustTool = "move" | "rotate" | "size";
+export type OutputChoice = "REALITY" | "ARCHVIZ";
 
 export interface Viewport {
   zoom: number;
@@ -36,10 +48,17 @@ export interface UIState {
   pickTool: PickTool;
   generating: GenerationStatus | null;
   intelligence: { learning: boolean; analyzing: boolean };
-  sheet: null | "projects" | "dev";
+  sheet: null | "projects" | "advanced" | "menu";
   present: { active: boolean; aspect: PresentAspect };
   toast: { id: number; text: string } | null;
   spaceDragOver: boolean;
+  /** Sticker-style placement tool while in FIT. */
+  adjustTool: AdjustTool;
+  /** Shows the four-anchor perspective editor, lens and reference measurement inside FIT. */
+  advancedAdjust: boolean;
+  /** Which output VISUALIZAR produces. REALIDAD by default. */
+  outputChoice: OutputChoice;
+  optionsOpen: boolean;
 }
 
 export const uiStore = createStore<UIState>({
@@ -55,6 +74,10 @@ export const uiStore = createStore<UIState>({
   present: { active: false, aspect: "16:9" },
   toast: null,
   spaceDragOver: false,
+  adjustTool: "move",
+  advancedAdjust: false,
+  outputChoice: "REALITY",
+  optionsOpen: false,
 });
 
 export function useUI<S>(selector: (s: UIState) => S): S {
@@ -119,5 +142,17 @@ export const ui = {
   },
   setSpaceDragOver(spaceDragOver: boolean) {
     uiStore.setState({ spaceDragOver });
+  },
+  setAdjustTool(adjustTool: AdjustTool) {
+    uiStore.setState({ adjustTool });
+  },
+  setAdvancedAdjust(advancedAdjust: boolean) {
+    uiStore.setState({ advancedAdjust, pickTool: null });
+  },
+  setOutputChoice(outputChoice: OutputChoice) {
+    uiStore.setState({ outputChoice, optionsOpen: false });
+  },
+  setOptionsOpen(optionsOpen: boolean) {
+    uiStore.setState({ optionsOpen });
   },
 };

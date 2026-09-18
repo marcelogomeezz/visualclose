@@ -5,7 +5,7 @@ import { ui, uiStore } from "./ui-store";
 import type { RenderBriefInput } from "@/providers/ai/types";
 import type { OutputRecord } from "@/core/types";
 
-const PHASES = ["Composing render brief", "Preserving the environment", "Placing the product", "Resolving"];
+const PHASES = ["Leyendo tu espacio", "Conservando lo real", "Colocando el producto", "Resolviendo"];
 const MIN_DURATION_MS = 3400;
 
 interface GenerateResponse {
@@ -52,14 +52,14 @@ export async function visualize(mode: "REALITY" | "ARCHVIZ"): Promise<OutputReco
       new Promise((r) => setTimeout(r, MIN_DURATION_MS)),
     ]);
     if (!res.result) {
-      ui.toast(res.error ?? "Visualization unavailable");
+      ui.toast(res.error ?? "Visualización no disponible");
       return null;
     }
     const record = await actions.addGeneratedOutput({ type: mode, ...res.result });
     if (record) ui.selectOutput(record.id);
     return record;
   } catch (e) {
-    ui.toast(e instanceof Error ? e.message : "Visualization failed");
+    ui.toast(e instanceof Error ? e.message : "La visualización ha fallado");
     return null;
   } finally {
     clearInterval(phaseTimer);
@@ -80,8 +80,7 @@ export async function learnProduct(): Promise<void> {
     ]);
     if (res.productDNA) {
       actions.setProductDNA(res.productDNA);
-      ui.toast("Product DNA created");
-    } else ui.toast(res.error ?? "Product analysis unavailable");
+    } else ui.toast(res.error ?? "Análisis de producto no disponible");
   } finally {
     ui.setIntelligence({ learning: false });
   }
@@ -108,8 +107,7 @@ export async function analyzeSpace(): Promise<void> {
     ]);
     if (res.sceneLock) {
       actions.setSceneLock(res.sceneLock);
-      ui.toast("Scene locked");
-    } else ui.toast(res.error ?? "Scene analysis unavailable");
+    } else ui.toast(res.error ?? "Análisis del espacio no disponible");
   } finally {
     ui.setIntelligence({ analyzing: false });
   }

@@ -47,9 +47,9 @@ export function VolumeSvg({ solve, dimensions, width, height, t, labels = true }
         ))}
         {labels && (
           <>
-            {label(b.FL, b.FR, `W ${dimensions.width.toFixed(dec)} ${dimensions.units}`, 0, font * 1.6)}
-            {label(b.FR, b.BR, `D ${dimensions.depth.toFixed(dec)} ${dimensions.units}`, font * 3.4, 0)}
-            {label(b.FL, tp.FL, `H ${dimensions.height.toFixed(dec)} ${dimensions.units}`, -font * 3.4, 0)}
+            {label(b.FL, b.FR, `${dimensions.width.toFixed(dec)} ${dimensions.units}`, 0, font * 1.6)}
+            {label(b.FR, b.BR, `${dimensions.depth.toFixed(dec)} ${dimensions.units}`, font * 3.4, 0)}
+            {label(b.FL, tp.FL, `${dimensions.height.toFixed(dec)} ${dimensions.units}`, -font * 3.4, 0)}
           </>
         )}
       </g>

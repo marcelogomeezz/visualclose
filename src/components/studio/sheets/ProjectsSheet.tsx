@@ -17,13 +17,13 @@ export function ProjectsSheet() {
     ui.closeSheet();
   };
   return (
-    <Sheet title="Projects">
+    <Sheet title="Proyectos">
       <div className="px-5 py-4 flex gap-2 hairline-b">
-        <Button variant="primary" onClick={() => void openAndClose(() => actions.newProject())}>
-          New project
+        <Button variant="primary" onClick={() => void openAndClose(() => actions.newProject("Proyecto sin título"))}>
+          Nuevo proyecto
         </Button>
         <Button variant="outline" onClick={() => void openAndClose(() => actions.loadDemoProject())}>
-          Load demo project
+          Cargar demo
         </Button>
       </div>
       <ul>
@@ -39,14 +39,14 @@ export function ProjectsSheet() {
                 </div>
               </button>
               <button type="button" className="t-label hover:text-danger transition-colors" onClick={() => void actions.deleteProject(p.id)}>
-                Delete
+                Eliminar
               </button>
             </li>
           );
         })}
-        {projects.length === 0 && <li className="px-5 py-6 text-[11px] text-warm-grey">Nothing saved yet.</li>}
+        {projects.length === 0 && <li className="px-5 py-6 text-[11px] text-warm-grey">Todavía no hay proyectos guardados.</li>}
       </ul>
-      <div className="px-5 py-4 text-[10.5px] text-warm-grey-2">Projects and uploaded files are stored locally in this browser (IndexedDB).</div>
+      <div className="px-5 py-4 text-[10.5px] text-warm-grey-2">Los proyectos y las fotos se guardan en este navegador.</div>
     </Sheet>
   );
 }

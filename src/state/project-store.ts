@@ -7,8 +7,11 @@ import {
   attachFootprintToWall,
   clampFootprint,
   defaultFootprint,
+  footprintInsideImage,
+  heightFromPointer,
   reprojectRectangle,
   resizeFootprint,
+  resizeFromCorner,
   rotateFootprint,
   translateFootprintOnGround,
 } from "@/core/geometry/footprint";
@@ -289,7 +292,9 @@ export const actions = {
         const solve = solveFor(p);
         if (solve && (dims.width !== p.dimensions.width || dims.depth !== p.dimensions.depth)) {
           const resized = resizeFootprint(solve, dims.width, dims.depth, p.dimensions.depth, p.productPack.placementType);
-          if (resized) footprint = clampFootprint(resized);
+          // Keep the product in frame: if the true-scale resize would leave the photograph, keep the
+          // footprint and let the new dimensions re-interpret it. The user then adjusts by hand.
+          if (resized && (footprintInsideImage(resized) || !footprintInsideImage(footprint))) footprint = clampFootprint(resized);
         }
         return { ...p, dimensions: dims, placement: { ...p.placement, footprint, locked: false, lockedAt: null } };
       },
@@ -329,6 +334,29 @@ export const actions = {
 
   setFootprint(footprint: Footprint): void {
     update((p) => ({ ...p, placement: { ...p.placement, footprint: clampFootprint(footprint), locked: false, lockedAt: null } }), { geometry: true });
+  },
+
+  /** Sticker-style corner resize: new dimensions and footprint together, under the solve captured at drag start. */
+  applyCornerResize(key: AnchorKey, pointer: NormalizedPoint, base: { solve: CameraSolve; width: number; depth: number }): void {
+    update((p) => {
+      const r = resizeFromCorner(base.solve, key, pointer, base.width, base.depth);
+      if (!r) return p;
+      const round = (v: number) => Math.round(v * 100) / 100;
+      return {
+        ...p,
+        dimensions: { ...p.dimensions, width: round(r.width), depth: round(r.depth) },
+        placement: { ...p.placement, footprint: clampFootprint(r.footprint), locked: false, lockedAt: null },
+      };
+    });
+  },
+
+  /** Height handle: sets height so the handle follows the pointer. */
+  applyHeightDrag(pointer: NormalizedPoint, base: { solve: CameraSolve; depth: number }): void {
+    update((p) => {
+      const h = heightFromPointer(base.solve, base.depth, pointer);
+      if (h === null) return p;
+      return { ...p, dimensions: { ...p.dimensions, height: Math.round(h * 100) / 100 }, placement: { ...p.placement, locked: false, lockedAt: null } };
+    });
   },
 
   translateOnGround(from: NormalizedPoint, to: NormalizedPoint, base: { solve: CameraSolve }): void {
@@ -528,7 +556,7 @@ export const actions = {
         const solve = solveFor(p);
         if (solve && (dims.width !== p.dimensions.width || dims.depth !== p.dimensions.depth)) {
           const resized = resizeFootprint(solve, dims.width, dims.depth, p.dimensions.depth, p.productPack.placementType);
-          if (resized) footprint = clampFootprint(resized);
+          if (resized && (footprintInsideImage(resized) || !footprintInsideImage(footprint))) footprint = clampFootprint(resized);
         }
         return { ...p, dimensions: { ...dims }, placement: { ...p.placement, footprint, locked: false, lockedAt: null } };
       },

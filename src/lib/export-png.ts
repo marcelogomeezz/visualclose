@@ -8,7 +8,7 @@ const IVORY_SOFT = "rgba(240, 236, 226, 0.55)";
 const PLANE = "rgba(240, 236, 226, 0.08)";
 const FOOTPRINT = "rgba(240, 236, 226, 0.16)";
 
-export const TECHNICAL_NOTE = "Visual placement guide. Verify final installation on site.";
+export const TECHNICAL_NOTE = "Visualización de referencia. Verificar medidas finales antes de instalación.";
 
 /**
  * Draws the technical view at source resolution with 2D canvas, using the same projection as the 3D layer.
@@ -106,9 +106,9 @@ export async function renderTechnicalPng(project: Project, solve: CameraSolve): 
       ctx.fillText(text, mx, my);
     };
     const dec = units === "m" || units === "ft" ? 2 : 0;
-    label(b.FL, b.FR, `W ${width.toFixed(dec)} ${units}`, 0, fontPx * 1.6);
-    label(b.FR, b.BR, `D ${depth.toFixed(dec)} ${units}`, fontPx * 3.2, 0);
-    label(b.FL, t.FL, `H ${height.toFixed(dec)} ${units}`, -fontPx * 3.2, 0);
+    label(b.FL, b.FR, `ANCHO ${width.toFixed(dec)} ${units}`, 0, fontPx * 1.6);
+    label(b.FR, b.BR, `FONDO ${depth.toFixed(dec)} ${units}`, fontPx * 3.6, 0);
+    label(b.FL, t.FL, `ALTO ${height.toFixed(dec)} ${units}`, -fontPx * 3.6, 0);
   }
 
   // Reference measurement
@@ -153,7 +153,7 @@ export async function renderTechnicalPng(project: Project, solve: CameraSolve): 
     project.productPack.installationType,
   ].join("   ·   ");
   ctx.fillText(config, pad, H - pad - smallPx * 1.9);
-  ctx.fillText(`TECHNICAL PLACEMENT   ·   ${TECHNICAL_NOTE}`, pad, H - pad - smallPx * 0.3);
+  ctx.fillText(`REAL PLAN   ·   ${TECHNICAL_NOTE}`, pad, H - pad - smallPx * 0.3);
   ctx.textAlign = "right";
   ctx.fillStyle = IVORY;
   ctx.font = `500 ${smallPx}px "Helvetica Neue", Helvetica, Arial, sans-serif`;

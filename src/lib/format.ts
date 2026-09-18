@@ -12,7 +12,19 @@ export function pad2(n: number): string {
   return n.toString().padStart(2, "0");
 }
 
+const TYPE_LABELS: Record<string, string> = {
+  ORIGINAL: "ORIGINAL",
+  TECHNICAL: "REAL PLAN",
+  REALITY: "REALIDAD",
+  ARCHVIZ: "ARQUITECTURA",
+  MOTION: "MOVIMIENTO",
+};
+
+export function typeLabel(type: string): string {
+  return TYPE_LABELS[type] ?? type;
+}
+
 export function outputLabel(type: string, index: number): string {
   if (type === "ORIGINAL") return "ORIGINAL";
-  return `${type} ${pad2(index)}`;
+  return `${typeLabel(type)} ${pad2(index)}`;
 }

@@ -1,4 +1,5 @@
 import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 // A single, calm easing vocabulary for the whole product.
 export const EASE = {
@@ -9,4 +10,8 @@ export const EASE = {
 
 gsap.defaults({ ease: EASE.out, duration: 0.6 });
 
-export { gsap };
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger);
+}
+
+export { gsap, ScrollTrigger };

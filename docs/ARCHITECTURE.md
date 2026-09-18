@@ -10,7 +10,8 @@ and risks.
 ```
 src/
   app/                      Next.js App Router
-    page.tsx                → mounts the Studio (single workspace)
+    page.tsx                → the Experience (public site)
+    studio/page.tsx         → the Studio (single workspace)
     layout.tsx, globals.css design tokens, typography
     api/ai/*/route.ts       server routes → AI provider adapter (mock today)
     api/generate/[mode]/route.ts server route → generation provider (mock today)
@@ -27,7 +28,8 @@ src/
     ui-store.ts             view mode, selection, present, dev
     persistence/            IndexedDB (idb): projects, blobs, meta
   components/
-    studio/                 TopBar, AssetDock, Canvas, Fit (R3F), Inspector, OutputStrip, sheets
+    experience/             Nav, Hero + HeroScene (R3F), scroll sections, CategoryScene (R3F), RealPlanOverlay, TransitionCurtain
+    studio/                 TopBar, rail (inputs), canvas, fit (R3F + sticker handles), outputs bar, sheets (Proyectos, Avanzado)
     present/                PresentMode + GSAP sequence + frames
     ui/                     tiny primitive set (Button, Field, Segmented, …)
   lib/                      gsap registration, image helpers, PNG export, formatting

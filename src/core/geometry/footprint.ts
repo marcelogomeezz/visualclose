@@ -30,6 +30,11 @@ export function clampFootprint(fp: Footprint, margin = -0.25): Footprint {
   return out;
 }
 
+/** True when every anchor lies inside the image (with a small tolerance). */
+export function footprintInsideImage(fp: Footprint, tolerance = 0.06): boolean {
+  return (Object.keys(fp) as AnchorKey[]).every((k) => fp[k].x >= -tolerance && fp[k].x <= 1 + tolerance && fp[k].y >= -tolerance && fp[k].y <= 1 + tolerance);
+}
+
 /** Signed area of the footprint polygon in image space; sign tells winding. */
 export function footprintArea(fp: Footprint): number {
   const pts = ANCHOR_ORDER.map((k) => fp[k]);
@@ -148,4 +153,70 @@ export function defaultFootprint(): Footprint {
     BL: { x: 0.36, y: 0.62 },
     BR: { x: 0.64, y: 0.62 },
   };
+}
+
+/**
+ * Sticker-style resize: drags one footprint corner on the ground while the opposite corner stays fixed.
+ * Returns the new dimensions and the re-projected footprint under the current camera.
+ */
+export function resizeFromCorner(
+  cam: CameraSolve,
+  key: AnchorKey,
+  pointer: NormalizedPoint,
+  width: number,
+  depth: number,
+  minSize = 0.2,
+): { width: number; depth: number; footprint: Footprint } | null {
+  const g = unprojectToGround(cam, pointer);
+  if (!g) return null;
+  const sx = key === "FR" || key === "BR" ? 1 : -1; // dragged corner side on X
+  const sz = key === "FL" || key === "FR" ? 1 : -1; // dragged corner side on Z (front = +Z)
+  const ox = -sx * (width / 2); // opposite corner stays fixed
+  const oz = -sz * (depth / 2);
+  const newW = Math.max(minSize, (g[0] - ox) * sx);
+  const newD = Math.max(minSize, (g[2] - oz) * sz);
+  const x0 = Math.min(ox, ox + sx * newW);
+  const x1 = Math.max(ox, ox + sx * newW);
+  const z0 = Math.min(oz, oz + sz * newD);
+  const z1 = Math.max(oz, oz + sz * newD);
+  const pts: Record<AnchorKey, Vec3> = { FL: [x0, 0, z1], FR: [x1, 0, z1], BL: [x0, 0, z0], BR: [x1, 0, z0] };
+  const footprint = projectWorldRect(cam, pts);
+  if (!footprint) return null;
+  return { width: newW, depth: newD, footprint };
+}
+
+/**
+ * Finds the height whose top-front-midpoint projects to the pointer's vertical position (bisection).
+ * Used by the height handle. Returns null when the pointer cannot be matched.
+ */
+export function heightFromPointer(cam: CameraSolve, depth: number, pointer: NormalizedPoint, minH = 0.1, maxH = 30): number | null {
+  const yAt = (h: number) => project(cam, [0, h, depth / 2])?.y ?? null;
+  const yMin = yAt(minH);
+  const yMax = yAt(maxH);
+  if (yMin === null || yMax === null) return null;
+  if (pointer.y >= yMin) return minH;
+  if (pointer.y <= yMax) return maxH;
+  let lo = minH;
+  let hi = maxH;
+  for (let i = 0; i < 40; i++) {
+    const mid = (lo + hi) / 2;
+    const y = yAt(mid);
+    if (y === null) return null;
+    if (y > pointer.y) lo = mid;
+    else hi = mid;
+  }
+  return (lo + hi) / 2;
+}
+
+/** True when the normalized point lies inside the footprint quad (image space). */
+export function pointInFootprint(fp: Footprint, p: NormalizedPoint): boolean {
+  const pts = ANCHOR_ORDER.map((k) => fp[k]);
+  let inside = false;
+  for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) {
+    const a = pts[i];
+    const b = pts[j];
+    const intersect = a.y > p.y !== b.y > p.y && p.x < ((b.x - a.x) * (p.y - a.y)) / (b.y - a.y) + a.x;
+    if (intersect) inside = !inside;
+  }
+  return inside;
 }

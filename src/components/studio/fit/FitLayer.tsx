@@ -108,9 +108,9 @@ export function PlacementVolume({ dimensions, showLabels = true, emphasis = 1 }:
       })}
       {showLabels && (
         <>
-          <DimensionLabel position={[0, 0, hd]} text={`W ${w.toFixed(dec)} ${units}`} />
-          <DimensionLabel position={[hw, 0, 0]} text={`D ${d.toFixed(dec)} ${units}`} />
-          <DimensionLabel position={[-hw, h / 2, hd]} text={`H ${h.toFixed(dec)} ${units}`} />
+          <DimensionLabel position={[0, 0, hd]} text={`${w.toFixed(dec)} ${units}`} />
+          <DimensionLabel position={[hw, 0, 0]} text={`${d.toFixed(dec)} ${units}`} />
+          <DimensionLabel position={[-hw, h / 2, hd]} text={`${h.toFixed(dec)} ${units}`} />
         </>
       )}
     </group>

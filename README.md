@@ -9,7 +9,11 @@ REAL SPACE + REAL PRODUCT + REAL DIMENSIONS + CONTROLLED PLACEMENT
 
 - Product intent: [`docs/VISUALCLOSE_PRD.md`](docs/VISUALCLOSE_PRD.md)
 - Architecture and 3D approach: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
-- Milestone 1 status: [`docs/MILESTONE_1.md`](docs/MILESTONE_1.md)
+- Milestone 1 (engine, first studio): [`docs/MILESTONE_1.md`](docs/MILESTONE_1.md)
+- UX audit before the redesign: [`docs/UX_AUDIT.md`](docs/UX_AUDIT.md)
+- Milestone 2 (simplified Studio + 3D Experience): [`docs/MILESTONE_2.md`](docs/MILESTONE_2.md)
+
+Routes: `/` is the public Experience (English), `/studio` is the Studio (Spanish UI).
 
 ## Run
 
@@ -25,6 +29,7 @@ npm run build          # production build (Vercel uses this)
 npm run lint
 npm run typecheck
 npm run test:geometry  # homography / camera solve round-trip tests
+npm run test:e2e       # primary Studio path in Chromium (needs `npm run dev` on :3000; see scripts/tests/studio-flow.test.mjs)
 npm run demo:assets    # re-render placeholder demo images (needs Chromium; see scripts/demo-assets/render.ts)
 ```
 

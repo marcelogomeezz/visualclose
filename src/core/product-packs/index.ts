@@ -15,4 +15,23 @@ export function clonePack(pack: ProductPack): ProductPack {
   return structuredClone(pack);
 }
 
+/** A blank pack for new projects: the user brings their own product. */
+export function createCustomPack(): ProductPack {
+  return {
+    id: `pack_custom_${Math.random().toString(36).slice(2, 8)}`,
+    name: "Mi producto",
+    category: "OTHER",
+    references: [],
+    dimensions: { width: 2, depth: 1, height: 1, units: "m" },
+    color: "",
+    material: "",
+    finish: "",
+    installationType: "",
+    customSpecifications: [],
+    placementType: "FLOOR_OBJECT",
+    notes: "",
+    productDNA: null,
+  };
+}
+
 export { milanoXPergola, lineaKitchen, travertineFacade, formaLounge };

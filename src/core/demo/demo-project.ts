@@ -1,5 +1,5 @@
 import { createId } from "../ids";
-import { clonePack, milanoXPergola } from "../product-packs";
+import { clonePack, createCustomPack, milanoXPergola } from "../product-packs";
 import type { Project, ProductPack } from "../types";
 import { defaultFootprint } from "../geometry/footprint";
 import { DEFAULT_FOV_DEG } from "../geometry/camera";
@@ -7,7 +7,7 @@ import { DEMO_PERGOLA_FOOTPRINT, DEMO_PERGOLA_FOV_DEG, DEMO_SPACE_SIZE } from ".
 
 export const DEMO_PROJECT_ID = "project_demo_milano_x";
 
-export function createEmptyProject(name = "Untitled project", pack: ProductPack = clonePack(milanoXPergola)): Project {
+export function createEmptyProject(name = "Proyecto sin título", pack: ProductPack = createCustomPack()): Project {
   const now = Date.now();
   return {
     id: createId("project"),

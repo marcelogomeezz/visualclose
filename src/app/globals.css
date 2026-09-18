@@ -49,8 +49,8 @@ body {
   overscroll-behavior: none;
 }
 
-body {
-  overflow: hidden;
+html {
+  scroll-behavior: smooth;
 }
 
 * {
