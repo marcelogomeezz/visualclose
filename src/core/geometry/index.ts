@@ -4,3 +4,4 @@ export * from "./camera";
 export * from "./footprint";
 export * from "./units";
 export * from "./synthetic";
+export * from "./mask";

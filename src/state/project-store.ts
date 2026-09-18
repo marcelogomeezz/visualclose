@@ -1,5 +1,5 @@
 import { createId } from "@/core/ids";
-import { createDemoProject, createEmptyProject, DEMO_PROJECT_ID } from "@/core/demo/demo-project";
+import { createDemoProject, createEmptyProject, migrateProject, DEMO_PROJECT_ID } from "@/core/demo/demo-project";
 import { clonePack, getProductPack } from "@/core/product-packs";
 import { estimateFovDeg, solveCamera, type CameraSolve } from "@/core/geometry/camera";
 import { convertUnits } from "@/core/geometry/units";
@@ -21,6 +21,7 @@ import type {
   Dimensions,
   Footprint,
   Lens,
+  MaskSettings,
   NormalizedPoint,
   OutputRecord,
   OutputType,
@@ -37,6 +38,7 @@ import type {
 } from "@/core/types";
 import { imageSize, makeThumbnail } from "@/lib/image";
 import { renderTechnicalPng } from "@/lib/export-png";
+import { renderPlacementMask, renderPlacementReference } from "@/lib/placement-mask";
 import { persistence } from "./persistence/db";
 import { dehydrateProject, hydrateProject, objectUrlFor, revokeObjectUrl } from "./persistence/hydrate";
 import { createStore, useStore } from "./store";
@@ -159,7 +161,7 @@ export const actions = {
       let project: Project | null = null;
       if (currentId) {
         const stored = await persistence.loadProject(currentId);
-        if (stored) project = await hydrateProject(stored);
+        if (stored) project = await hydrateProject(migrateProject(stored));
       }
       if (!project) {
         project = createDemoProject();
@@ -185,7 +187,7 @@ export const actions = {
   async openProject(id: string): Promise<void> {
     const stored = await persistence.loadProject(id);
     if (!stored) return;
-    setProject(await hydrateProject(stored));
+    setProject(await hydrateProject(migrateProject(stored)));
   },
 
   async deleteProject(id: string): Promise<void> {
@@ -213,6 +215,9 @@ export const actions = {
           space: { asset, width: asset.width ?? 1600, height: asset.height ?? 1067 },
           placement: { ...p.placement, footprint: defaultFootprint(), wallAnchor: null, rotationDeg: 0, locked: false, lockedAt: null },
           geometryReference: null,
+          placementReference: null,
+          placementMask: null,
+          placementAssetsRevision: null,
           sceneLock: null,
           referenceMeasurement: null,
           outputs: [],
@@ -228,7 +233,18 @@ export const actions = {
     update(
       (p) => {
         if (p.space?.asset.kind === "blob") revokeObjectUrl(p.space.asset.id);
-        return { ...p, space: null, outputs: [], geometryReference: null, sceneLock: null, referenceMeasurement: null, placement: { ...p.placement, locked: false, lockedAt: null } };
+        return {
+          ...p,
+          space: null,
+          outputs: [],
+          geometryReference: null,
+          placementReference: null,
+          placementMask: null,
+          placementAssetsRevision: null,
+          sceneLock: null,
+          referenceMeasurement: null,
+          placement: { ...p.placement, locked: false, lockedAt: null },
+        };
       },
       { geometry: true },
     );
@@ -421,6 +437,50 @@ export const actions = {
     update((p) => ({ ...p, referenceMeasurement: m }));
   },
 
+  /**
+   * Builds the two AI inputs from the current placement: PLACEMENT REFERENCE (photo + clean outline)
+   * and PLACEMENT MASK (editable region). Stored separately from any user-facing output.
+   */
+  async ensurePlacementAssets(force = false): Promise<boolean> {
+    const { project } = projectStore.getState();
+    if (!project?.space) return false;
+    if (!force && project.placementMask && project.placementReference && project.placementAssetsRevision === project.revision) return true;
+    const solve = solveFor(project);
+    if (!solve) return false;
+    try {
+      const [mask, reference] = await Promise.all([renderPlacementMask(project, solve), renderPlacementReference(project, solve)]);
+      const maskId = createId("mask");
+      const refId = createId("pref");
+      await persistence.putAsset(maskId, mask, "placement-mask.png", "image/png");
+      await persistence.putAsset(refId, reference, "placement-reference.png", "image/png");
+      const revision = projectStore.getState().project?.revision ?? project.revision;
+      update((p) => {
+        if (p.placementMask?.kind === "blob") {
+          revokeObjectUrl(p.placementMask.id);
+          void persistence.deleteAsset(p.placementMask.id);
+        }
+        if (p.placementReference?.kind === "blob") {
+          revokeObjectUrl(p.placementReference.id);
+          void persistence.deleteAsset(p.placementReference.id);
+        }
+        return {
+          ...p,
+          placementMask: { id: maskId, kind: "blob", url: objectUrlFor(maskId, mask), name: "placement-mask.png", mime: "image/png" },
+          placementReference: { id: refId, kind: "blob", url: objectUrlFor(refId, reference), name: "placement-reference.png", mime: "image/png" },
+          placementAssetsRevision: revision,
+        };
+      });
+      return true;
+    } catch (e) {
+      console.warn("VisualClose: placement assets failed", e);
+      return false;
+    }
+  },
+
+  setMaskSettings(partial: Partial<MaskSettings>): void {
+    update((p) => ({ ...p, maskSettings: { ...p.maskSettings, ...partial }, placementAssetsRevision: null }));
+  },
+
   async lockPlacement(): Promise<boolean> {
     const { project } = projectStore.getState();
     if (!project?.space) return false;
@@ -471,6 +531,7 @@ export const actions = {
       },
       outputs: technical ? [...p.outputs, technical] : p.outputs,
     }));
+    await actions.ensurePlacementAssets(true);
     return true;
   },
 
@@ -488,19 +549,31 @@ export const actions = {
 
   async addGeneratedOutput(input: {
     type: "REALITY" | "ARCHVIZ" | "MOTION";
-    assetUrl: string;
+    /** Either a static URL or a ready AssetRef (blob composed in the browser). */
+    assetUrl?: string;
+    asset?: AssetRef;
     mime: string;
     width?: number;
     height?: number;
     provenance: OutputRecord["provenance"];
     registered: boolean;
     variant?: string;
+    preservation?: OutputRecord["preservation"];
   }): Promise<OutputRecord | null> {
     const { project } = projectStore.getState();
     if (!project) return null;
-    let thumbnail: AssetRef = { id: createId("thumb"), kind: "url", url: input.assetUrl, name: "thumb", mime: input.mime };
+    const asset: AssetRef = input.asset ?? {
+      id: createId("asset"),
+      kind: "url",
+      url: input.assetUrl ?? "",
+      name: `${input.type.toLowerCase()}.jpg`,
+      mime: input.mime,
+      width: input.width,
+      height: input.height,
+    };
+    let thumbnail: AssetRef = { id: createId("thumb"), kind: "url", url: asset.url, name: "thumb", mime: input.mime };
     try {
-      const t = await makeThumbnail(input.assetUrl, 360);
+      const t = await makeThumbnail(asset.url, 360);
       const id = createId("thumb");
       await persistence.putAsset(id, t, "thumb.jpg", "image/jpeg");
       thumbnail = { id, kind: "blob", url: objectUrlFor(id, t), name: "thumb.jpg", mime: "image/jpeg" };
@@ -514,12 +587,13 @@ export const actions = {
       sourceRevision: project.revision,
       spaceAssetId: project.space?.asset.id ?? null,
       createdAt: Date.now(),
-      asset: { id: createId("asset"), kind: "url", url: input.assetUrl, name: `${input.type.toLowerCase()}.jpg`, mime: input.mime, width: input.width, height: input.height },
+      asset,
       thumbnail,
       provenance: input.provenance,
       settings: { ...settingsSnapshot(project), variant: input.variant },
       favorite: false,
       registered: input.registered,
+      preservation: input.preservation,
     };
     update((p) => ({ ...p, outputs: [...p.outputs, record] }));
     return record;

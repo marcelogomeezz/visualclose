@@ -34,12 +34,16 @@ export async function hydrateProject(project: Project): Promise<Project> {
     project.outputs.map(async (o) => ({ ...o, asset: await hydrateAsset(o.asset), thumbnail: await hydrateAsset(o.thumbnail) })),
   );
   const prospectLogo = project.presentation.prospectLogo ? await hydrateAsset(project.presentation.prospectLogo) : null;
+  const placementReference = project.placementReference ? await hydrateAsset(project.placementReference) : null;
+  const placementMask = project.placementMask ? await hydrateAsset(project.placementMask) : null;
   return {
     ...project,
     space,
     productPack: { ...project.productPack, references },
     outputs,
     presentation: { ...project.presentation, prospectLogo },
+    placementReference,
+    placementMask,
   };
 }
 
@@ -52,5 +56,7 @@ export function dehydrateProject(project: Project): Project {
     productPack: { ...project.productPack, references: project.productPack.references.map((r) => ({ ...r, asset: strip(r.asset) })) },
     outputs: project.outputs.map((o) => ({ ...o, asset: strip(o.asset), thumbnail: strip(o.thumbnail) })),
     presentation: { ...project.presentation, prospectLogo: project.presentation.prospectLogo ? strip(project.presentation.prospectLogo) : null },
+    placementReference: project.placementReference ? strip(project.placementReference) : null,
+    placementMask: project.placementMask ? strip(project.placementMask) : null,
   };
 }

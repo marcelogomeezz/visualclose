@@ -1,43 +1,40 @@
 import { getProductPack } from "@/core/product-packs";
-import type { GenerationProvider, GenerationRequest, GenerationResult } from "./types";
+import type { ArchitectureRequest, GenerationProvider, GenerationResult, RealityEditRequest } from "./types";
 
-const GENERIC = {
-  REALITY: "/demo/generic/reality.jpg",
-  ARCHVIZ: "/demo/generic/archviz.jpg",
-} as const;
+const GENERIC_ARCHVIZ = "/demo/generic/archviz.jpg";
 
-/** Returns pre-rendered placeholder outputs. Never claims to have generated anything. */
+/**
+ * Mock provider. REALITY is delegated to the client compositor so the user's own photograph stays the
+ * base image; nothing here reconstructs a scene. ARCHITECTURE returns placeholder art.
+ */
 export class MockGenerationProvider implements GenerationProvider {
   readonly id = "mock" as const;
 
-  private resolve(kind: "REALITY" | "ARCHVIZ", req: GenerationRequest): GenerationResult {
-    const pack = getProductPack(req.productPackId);
-    const packAsset = kind === "REALITY" ? pack?.demoOutputs?.reality : pack?.demoOutputs?.archviz;
-    const usePackAsset = !!packAsset && req.spaceIsDemoAsset;
+  async generateReality(_req: RealityEditRequest): Promise<GenerationResult> {
     return {
-      assetUrl: usePackAsset ? packAsset : GENERIC[kind],
-      mime: "image/jpeg",
-      width: 1920,
-      height: 1280,
+      kind: "client-composite",
       provenance: {
         provider: "mock",
-        note: usePackAsset
-          ? `Pre-rendered placeholder ${kind.toLowerCase()} for ${pack?.name ?? req.productPackId}`
-          : "Generic placeholder. The mock provider cannot render an uploaded space.",
+        note: "Muestra: producto de referencia compuesto dentro de la máscara sobre tu foto. La IA insertará el producto real en esta zona.",
       },
-      registered: usePackAsset,
     };
   }
 
-  async generateReality(req: GenerationRequest): Promise<GenerationResult> {
-    return this.resolve("REALITY", req);
-  }
-
-  async generateArchviz(req: GenerationRequest): Promise<GenerationResult> {
-    return this.resolve("ARCHVIZ", req);
+  async generateArchviz(req: ArchitectureRequest): Promise<GenerationResult> {
+    const pack = getProductPack(req.productPackId);
+    const packAsset = req.originalPhoto.isDemoAsset ? pack?.demoOutputs?.archviz : undefined;
+    return {
+      kind: "edited-photo",
+      assetUrl: packAsset ?? GENERIC_ARCHVIZ,
+      mime: "image/jpeg",
+      width: 1920,
+      height: 1280,
+      provenance: { provider: "mock", note: packAsset ? "PLACEHOLDER · arte sintético de demo, no una foto." : "PLACEHOLDER genérico. El proveedor real producirá la visualización arquitectónica." },
+      registered: !!packAsset,
+    };
   }
 
   async generateMotion(): Promise<GenerationResult> {
-    throw new Error("MOTION is experimental and not available in Milestone 1.");
+    throw new Error("MOVIMIENTO llegará más adelante.");
   }
 }

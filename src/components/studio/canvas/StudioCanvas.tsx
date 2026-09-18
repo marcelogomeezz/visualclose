@@ -12,6 +12,7 @@ import { GenerationOverlay } from "./GenerationOverlay";
 import { CompareSlider } from "./CompareSlider";
 import { RealPlanFrame } from "./RealPlanFrame";
 import { FitLayer } from "../fit/FitLayer";
+import { PhotoPlanOverlay } from "./PhotoPlanOverlay";
 import { FootprintHandles } from "../fit/FootprintHandles";
 import { StickerHandles } from "../fit/StickerHandles";
 import { MeasureOverlay } from "../fit/MeasureOverlay";
@@ -91,13 +92,14 @@ export function StudioCanvas() {
                   )
                 ) : (
                   <>
+                    {/* The original photograph stays on screen: the result appears inside it, same viewport. */}
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={space.asset.url} alt="" className="absolute inset-0 w-full h-full opacity-55" draggable={false} />
+                    <img src={space.asset.url} alt="" className="absolute inset-0 w-full h-full" draggable={false} />
                     {!generating && (
-                      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                        <div className="text-center bg-graphite-0/55 px-6 py-4">
-                          <div className="t-label-strong mb-1">Aún no hay {MODE_LABELS[mode]}</div>
-                          <div className="text-[11px] text-warm-grey">Pulsa VISUALIZAR ✦</div>
+                      <div className="absolute inset-x-0 bottom-6 flex justify-center pointer-events-none">
+                        <div className="text-center bg-graphite-0/70 border border-line px-6 py-3.5">
+                          <Equation />
+                          <div className="text-[11px] text-warm-grey mt-1.5">Pulsa VISUALIZAR ✦ y el producto aparecerá en esta misma foto.</div>
                         </div>
                       </div>
                     )}
@@ -106,9 +108,9 @@ export function StudioCanvas() {
               ) : mode === "MOTION" ? (
                 <>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={space.asset.url} alt="" className="absolute inset-0 w-full h-full opacity-40" draggable={false} />
+                  <img src={space.asset.url} alt="" className="absolute inset-0 w-full h-full" draggable={false} />
                   <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                    <div className="border border-line-strong px-8 py-6 text-center bg-graphite-0/50">
+                    <div className="border border-line-strong px-8 py-6 text-center bg-graphite-0/70">
                       <div className="t-label-strong mb-1">Movimiento</div>
                       <div className="text-[11px] text-warm-grey">Próximamente.</div>
                     </div>
@@ -119,7 +121,8 @@ export function StudioCanvas() {
                 <img src={space.asset.url} alt="" className="absolute inset-0 w-full h-full" draggable={false} />
               )}
 
-              {(mode === "FIT" || mode === "TECHNICAL") && <FitLayer solve={solve} dimensions={project.dimensions} zoom={stage.zoom} showLabels />}
+              {mode === "FIT" && <FitLayer solve={solve} dimensions={project.dimensions} zoom={stage.zoom} showLabels />}
+              {mode === "TECHNICAL" && solve && <PhotoPlanOverlay solve={solve} dimensions={project.dimensions} imageWidth={space.width} imageHeight={space.height} stage={stage} />}
               {mode === "FIT" && advanced && (
                 <MeasureOverlay stage={stage} measurement={project.referenceMeasurement} pending={pendingA} wallAnchor={project.placement.wallAnchor} pickTool={pickTool} />
               )}
@@ -136,9 +139,10 @@ export function StudioCanvas() {
 
       {space && mode === "TECHNICAL" && <RealPlanFrame project={project} />}
       {space && mode !== "TECHNICAL" && !generating && (
-        <div className="absolute top-4 left-5 z-20 pointer-events-none">
+        <div className="absolute top-4 left-5 z-20 pointer-events-none flex items-center gap-2">
           <span className="t-label-strong bg-graphite-0/60 px-2 py-1">{MODE_LABELS[mode]}</span>
-          <span className="ml-2 text-[11px] text-warm-grey hidden md:inline">{MODE_COPY[mode]}</span>
+          {isVisual && visualOutput?.provenance.provider === "mock" && <span className="t-label text-champagne bg-graphite-0/60 px-2 py-1">muestra</span>}
+          <span className="text-[11px] text-warm-grey hidden md:inline">{MODE_COPY[mode]}</span>
         </div>
       )}
       {space && mode === "FIT" && !solve && (
@@ -165,7 +169,7 @@ export function StudioCanvas() {
               {compare ? "Salir" : "Antes / Después"}
             </button>
           )}
-          {isVisual && visualOutput && !canCompare && <span className="t-label bg-graphite-0/60 px-2 py-1">Resultado de muestra · no alineado con tu foto</span>}
+          {isVisual && visualOutput && !canCompare && <span className="t-label bg-graphite-0/60 px-2 py-1">Muestra · no alineada con tu foto</span>}
           {downloadable && (
             <button
               type="button"
@@ -180,5 +184,18 @@ export function StudioCanvas() {
       )}
       <GenerationOverlay />
     </main>
+  );
+}
+
+/** The whole product in one line. */
+export function Equation({ className = "" }: { className?: string }) {
+  return (
+    <div className={`flex items-center justify-center gap-2.5 text-[10.5px] tracking-[0.16em] uppercase ${className}`}>
+      <span className="text-ivory">Tu foto</span>
+      <span className="text-warm-grey">+</span>
+      <span className="text-ivory">Tu producto</span>
+      <span className="text-warm-grey">=</span>
+      <span className="text-champagne">Tu foto con el producto</span>
+    </div>
   );
 }

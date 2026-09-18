@@ -93,9 +93,18 @@ The real uploaded environment photograph stays visually dominant.
 | ORIGINAL | Source photograph, zoom and pan, no decorative motion. |
 | FIT | Real React Three Fiber placement layer with a translucent architectural Placement Volume sized from the configured dimensions. Translate, rotate, change width/depth/height. Dimensions are deterministic numeric state; AI is never authoritative for dimensions. |
 | TECHNICAL | Photograph + volume + footprint + dimensions + product name + configuration. Not a construction drawing. Note: "Visual placement guide. Verify final installation on site." PNG export. |
-| REALITY | "See it as if it were already installed." Environment remains authoritative. |
-| ARCHVIZ | "See the architectural vision." Same product, placement and dimensions with refined presentation. Never a recolor of REALITY. |
+| REALITY | "See it as if it were already installed." **Photographic editing, not scene generation**: the original photograph is the base image and the product is installed into that same photograph. Camera, framing, architecture, walls, windows, doors, floor, landscape, plants, sky, background and existing objects outside the installation region remain unchanged; only the product and its contact effects (shadows, reflections, occlusion, contact, lighting) are added. Never a reconstructed scene, never the 3D model. |
+| ARCHVIZ | "See the architectural vision." The only output allowed to feel like an architectural render. Secondary to REALITY. |
 | MOTION | "See the transformation in motion." EXPERIMENTAL / COMING LATER. |
+
+### Source-of-truth rule
+
+**AI changes the product region. The real photograph remains the source of truth.**
+
+Three.js is an internal spatial tool only: placement, dimensions, orientation, perspective guidance, footprint,
+anchor points, and the generation of a placement reference and an editable mask. It is never the final visual
+result; once placement is done the guide disappears and the Studio returns to the original photograph.
+REAL PLAN is the original photograph plus elegant spatial overlays, never a recreated environment.
 
 ### Geometric honesty rules
 
@@ -184,7 +193,9 @@ Future providers are connected through server-side adapters only:
 
 - OpenAI (GPT-6 Astra): `analyzeScene`, `analyzeProduct`, `createRenderBrief`,
   `validateResult`.
-- Higgsfield: `generateReality`, `generateArchviz`, `generateMotion`.
+- Higgsfield: `generateReality` (an image **edit** with `originalPhoto`, `productReferences`, `productDNA`,
+  `placementReference`, `placementMask`, `dimensions`, `scenePreservationRules` → `editedPhoto`),
+  `generateArchviz`, `generateMotion`.
 
 No live AI calls in the first pass. Never expose provider credentials
 client-side. Never invent endpoint URLs or model IDs.

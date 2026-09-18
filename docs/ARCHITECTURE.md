@@ -134,6 +134,39 @@ Honesty: single photo, planar ground assumption, operator-authored anchors.
 The lens estimate and a "perspective consistency" hint are visible, and the
 TECHNICAL view carries the on-site verification note.
 
+## 4b. REALITY pipeline: photo editing, not scene generation
+
+**AI changes the product region. The real photograph remains the source of truth.**
+
+```
+originalPhoto ─┐
+productRefs ───┤
+productDNA ────┤          ┌────────────────────┐
+placementRef ──┼────────▶ │ generateReality()  │ ───▶ editedPhoto ──▶ preservation check ──▶ REALIDAD
+placementMask ─┤          └────────────────────┘        (outside the mask must match the original)
+dimensions ────┤
+preservation ──┘
+rules
+```
+
+- **Placement reference** (`renderPlacementReference`): the original photograph with a clean outline of the
+  placement volume. Perspective guidance for the editor. No labels unless requested.
+- **Placement mask** (`renderPlacementMask`): white-on-black editable region = convex hull of the projected
+  volume and its ground shadow, padded by `maskSettings.paddingPx` for shadows, occlusion and contact.
+  Stored separately from the reference (`project.placementMask`, `project.placementReference`).
+- **Scene preservation rules** (`ScenePreservationRules`): what must not change (from the scene analysis when
+  available) and the single editable region.
+- **Validation** (`core/validation/preservation.ts`): compares ORIGINAL vs REALITY outside the mask and reports
+  the share of changed pixels. It flags a moved door, a changed floor or a missing plant. It is an estimate
+  for internal QA, never a pixel-perfect guarantee.
+- **Mock today**: no provider is connected, so `MockGenerationProvider.generateReality` returns
+  `client-composite` and the browser composes a product proxy inside the mask over the user's own photograph
+  (`lib/reality-composite.ts`). By construction every pixel outside the mask equals the original. The result is
+  labelled *muestra*. It is a stand-in for the real product, never a reconstructed scene.
+- Three.js is used for placement, dimensions, orientation, perspective guidance, footprint, anchor points and
+  the two AI inputs above. It is never shown as REALIDAD or REAL PLAN; REAL PLAN draws its overlay as SVG over
+  the photograph.
+
 ## 5. Provider adapters
 
 ```
@@ -153,7 +186,8 @@ IDs are invented. Credentials never leave the server.
 | --- | --- | --- |
 | Product DNA | Deterministic template from Product Pack fields (curated for the demo packs) | `analyzeProduct()` via OpenAI |
 | Scene Lock | Deterministic template (curated for the demo space) | `analyzeScene()` via OpenAI |
-| REALITY / ARCHVIZ outputs | Pre-rendered placeholder images per pack; for user-uploaded spaces the mock is flagged *not registered* | Higgsfield image generation with render brief |
+| REALITY | Client-side composite of a product proxy inside the placement mask over the user's photograph (labelled *muestra*) | Higgsfield image **edit** of the same photograph |
+| ARCHVIZ | PLACEHOLDER synthetic art for the demo pack, generic placeholder otherwise | Stylised architectural visualization |
 | MOTION | Disabled slot, EXPERIMENTAL | Higgsfield / Genjutsu video |
 | Demo photographs | Synthetic placeholder scenes rendered by `scripts/demo-assets` (Higgsfield credits were not available during the build) | Real photography and generated outputs |
 | Generation transition | Timed GSAP sequence with restrained status language | Real job status |

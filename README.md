@@ -33,6 +33,12 @@ npm run test:e2e       # primary Studio path in Chromium (needs `npm run dev` on
 npm run demo:assets    # re-render placeholder demo images (needs Chromium; see scripts/demo-assets/render.ts)
 ```
 
+## Principle
+
+**AI changes the product region. The real photograph remains the source of truth.**
+REALIDAD is an edit of the customer's photograph, never a reconstructed scene; Three.js is an internal placement
+tool that produces the placement reference and the editable mask. See `docs/ARCHITECTURE.md` §4b.
+
 ## Stack
 
 Next.js 16 (App Router) · React 19 · TypeScript · React Three Fiber · Three.js · drei · GSAP · Tailwind 4 (layout only) · idb (IndexedDB).

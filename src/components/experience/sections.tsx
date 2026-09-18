@@ -9,9 +9,10 @@ import { CategoryScene, CATEGORY_GROUPS } from "./CategoryScene";
 import { BeforeAfter } from "./BeforeAfter";
 import { RealPlanOverlay } from "./RealPlanOverlay";
 import { useCurtainNavigate } from "./TransitionCurtain";
+import { useDemoReality } from "./useDemoReality";
 
+// PLACEHOLDER demo photograph (synthetic). REALIDAD below is composed over it in the browser, never pre-rendered.
 const SPACE = "/demo/pergola/space.jpg";
-const REALITY = "/demo/pergola/reality.jpg";
 const ARCHVIZ = "/demo/pergola/archviz.jpg";
 const DIMS = { width: 5, depth: 4, height: 2.7, units: "m" as const };
 const FOCUS = { x: 0.47, y: 0.6 };
@@ -103,6 +104,7 @@ export function Hero() {
 
 export function StorySection() {
   const ref = useRef<HTMLElement>(null);
+  const reality = useDemoReality();
   const progress = useScrollProgress(ref);
   const [manual, setManual] = useState<number | null>(null);
   const reveal = Math.min(1, Math.max(0, (progress - 0.15) / 0.55));
@@ -110,7 +112,7 @@ export function StorySection() {
   return (
     <section id="story" ref={ref} className="relative h-[240vh] bg-graphite-0">
       <div className="sticky top-0 h-[100svh] overflow-hidden">
-        <BeforeAfter before={SPACE} after={REALITY} width={DEMO_SPACE_SIZE.width} height={DEMO_SPACE_SIZE.height} position={position} focus={FOCUS} onChange={progress > 0.7 ? setManual : undefined} />
+        <BeforeAfter before={SPACE} after={reality ?? SPACE} width={DEMO_SPACE_SIZE.width} height={DEMO_SPACE_SIZE.height} position={position} focus={FOCUS} onChange={progress > 0.7 ? setManual : undefined} />
         <div className="absolute inset-0 bg-gradient-to-t from-graphite-0/85 via-transparent to-graphite-0/30 pointer-events-none" />
         <div className="absolute left-5 md:left-8 bottom-10 md:bottom-14 pointer-events-none">
           <div className="t-label mb-3" style={{ opacity: Math.min(1, progress * 4) }}>
@@ -122,7 +124,7 @@ export function StorySection() {
             <span style={{ opacity: reveal }}>SEE IT.</span>
           </h2>
           <div className="mt-4 t-label" style={{ opacity: progress > 0.7 ? 1 : 0 }}>
-            Drag to compare
+            Drag to compare · same photograph, only the product changes
           </div>
         </div>
       </div>
@@ -263,6 +265,7 @@ function OutputCard({ kicker, title, copy, children, primary = false }: { kicker
 }
 
 export function OutputsSection() {
+  const reality = useDemoReality();
   return (
     <section className="bg-graphite-0 py-24 md:py-36 overflow-hidden">
       <div className="px-5 md:px-8">
@@ -271,14 +274,14 @@ export function OutputsSection() {
           <h2 className="t-editorial text-ivory" style={{ fontSize: "clamp(32px, 4.5vw, 64px)" }}>
             NOT A RENDER.
             <br />
-            YOUR SPACE, WITH THE PRODUCT IN IT.
+            YOUR PHOTO, WITH THE PRODUCT IN IT.
           </h2>
         </Reveal>
       </div>
       <div className="mt-12 md:mt-16 flex gap-5 md:gap-8 px-5 md:px-8 overflow-x-auto snap-x snap-mandatory vc-scroll pb-4">
-        <OutputCard kicker="01" title="REALITY" copy="The product naturally integrated into the real photograph. The primary output." primary>
+        <OutputCard kicker="01" title="REALITY" copy="Your photograph, edited: the product installed inside it. Everything else stays exactly as it was. The primary output." primary>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={REALITY} alt="" className="absolute inset-0 w-full h-full object-cover" />
+          {reality && <img src={reality} alt="" className="absolute inset-0 w-full h-full object-cover" />}
         </OutputCard>
         <OutputCard kicker="02" title="REAL PLAN" copy="The real photograph with spatial and dimensional information.">
           <CoverImage
@@ -290,13 +293,13 @@ export function OutputsSection() {
             )}
           />
         </OutputCard>
-        <OutputCard kicker="03" title="ARCHITECTURE" copy="A refined architectural presentation of the same placement.">
+        <OutputCard kicker="03" title="ARCHITECTURE" copy="A more stylised architectural visualization of the same placement. Secondary.">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={ARCHVIZ} alt="" className="absolute inset-0 w-full h-full object-cover" />
         </OutputCard>
         <OutputCard kicker="04" title="MOTION" copy="Future video visualization. Coming later.">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={REALITY} alt="" className="absolute inset-0 w-full h-full object-cover opacity-30" />
+          <img src={SPACE} alt="" className="absolute inset-0 w-full h-full object-cover opacity-30" />
           <div className="absolute inset-0 flex items-center justify-center">
             <span className="t-label-strong border border-line-strong px-3 py-1.5 bg-graphite-0/60">Coming later</span>
           </div>
@@ -346,7 +349,7 @@ export function FooterCta() {
       </Reveal>
       <div className="mt-20 flex items-center justify-between t-label">
         <span>VISUALCLOSE</span>
-        <span>Real products · Real spaces</span>
+        <span>Demo imagery is placeholder art · Real products · Real spaces</span>
       </div>
     </section>
   );

@@ -19,6 +19,6 @@ export const formaLounge: ProductPack = {
     { label: "Cushions", value: "Removable, weatherproof" },
   ],
   placementType: "FLOOR_OBJECT",
-  notes: "Standalone product demo pack. Assets are placeholders.",
+  notes: "Standalone product demo pack. PLACEHOLDER: reference drawings are synthetic, not photographs.",
   productDNA: null,
 };

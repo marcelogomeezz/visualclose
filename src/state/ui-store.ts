@@ -17,8 +17,8 @@ export const MODE_LABELS: Record<ViewMode, string> = {
 export const MODE_COPY: Record<ViewMode, string> = {
   ORIGINAL: "Tu espacio, tal cual es.",
   FIT: "Coloca el producto en el espacio.",
-  TECHNICAL: "La foto real con medidas y colocación.",
-  REALITY: "El producto integrado en tu espacio.",
+  TECHNICAL: "Tu foto con la colocación y las medidas.",
+  REALITY: "Tu misma foto, con el producto instalado.",
   ARCHVIZ: "Presentación arquitectónica.",
   MOTION: "Próximamente.",
 };

@@ -10,6 +10,7 @@
     "typecheck": "tsc --noEmit -p .",
     "test:geometry": "tsx scripts/tests/geometry.test.ts",
     "test:e2e": "node scripts/tests/studio-flow.test.mjs",
+    "test:mask": "tsx scripts/tests/mask.test.ts",
     "demo:assets": "tsx scripts/demo-assets/render.ts"
   },
   "dependencies": {

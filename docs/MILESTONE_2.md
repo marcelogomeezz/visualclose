@@ -49,6 +49,26 @@ work is in `docs/UX_AUDIT.md`.
 - `npm run test:geometry` — 20 checks (homography round-trip, lens estimation, convexity guard, sticker handles).
 - `npm run test:e2e` — Chromium run of the primary Studio path against a dev server: upload space → auto analysis → add product → dimensions → AJUSTAR (move, rotate, corner resize) → LISTO → REAL PLAN → VISUALIZAR → REALIDAD → REAL PLAN view → Before / After (on the demo project, since uploaded spaces have no registered mock output). 18 checks, no console errors.
 
+## Correction: REALITY is photographic editing
+
+> **AI changes the product region. The real photograph remains the source of truth.**
+
+- REALIDAD is no longer a pre-rendered scene. `public/demo/pergola/reality.jpg` is gone. The mock provider
+  returns `client-composite` and the browser paints a product proxy **only inside the placement mask** over the
+  user's own photograph. Every pixel outside the mask is the original; the output is labelled *muestra*.
+- Uploaded photographs now get a registered REALIDAD (it is their own photo), so ANTES / DESPUÉS works for
+  them too, in the same viewport.
+- LISTO ✓ hides the 3D guide and returns to the clean original photograph. REAL PLAN is available in the bottom
+  bar and draws its overlay as SVG over the photograph; no WebGL in any output.
+- New per-project AI inputs: `placementReference` and `placementMask` (regenerated on LISTO and before every
+  VISUALIZAR when the geometry changed), with `maskSettings` (padding, shadow reach) in Avanzado.
+- New validation interface: `comparePreservation()` and `estimatePreservation()` report the share of changed
+  pixels outside the mask. Shown in Avanzado as *Fondo conservado*, clearly marked as an estimate.
+- Provider abstraction now speaks edit: `RealityEditRequest` → `editedPhoto` (`GenerationResult`). No Higgsfield
+  endpoint is invented.
+- Demo imagery is explicitly PLACEHOLDER (synthetic drawings). A real photographic pair (same camera, crop,
+  background, architecture; only the product differs) is required before REALIDAD has a visual target.
+
 ## Still mocked / still open
 
 - Everything AI: analyses and outputs are the same mock providers as Milestone 1. Uploaded spaces cannot get a registered REALIDAD until a provider is connected.

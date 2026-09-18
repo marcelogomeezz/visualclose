@@ -117,9 +117,8 @@ export interface ProductPack {
   notes: string;
   /** Future AI Product DNA. Null until LEARN PRODUCT runs. */
   productDNA: ProductDNA | null;
-  /** Placeholder outputs used by the mock generation provider. */
+  /** PLACEHOLDER art for the secondary ARQUITECTURA mock only. REALIDAD is always an edit of the original photograph. */
   demoOutputs?: {
-    reality?: string;
     archviz?: string;
   };
 }

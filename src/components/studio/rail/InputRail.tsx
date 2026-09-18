@@ -9,6 +9,7 @@ import { ui, useUI, type AdjustTool } from "@/state/ui-store";
 import { usePlacementSolve } from "@/state/derived";
 import { visualize } from "@/state/visualize";
 import { DropZone } from "../dock/DropZone";
+import { Equation } from "../canvas/StudioCanvas";
 import { NumberField } from "@/components/ui/NumberField";
 import { Icon } from "@/components/ui/icons";
 
@@ -259,9 +260,9 @@ function AdjustPanel() {
         onClick={async () => {
           const ok = await actions.lockPlacement();
           if (ok) {
-            ui.setMode("TECHNICAL");
+            ui.setMode("ORIGINAL");
             ui.selectOutput(null);
-            ui.toast("Colocación guardada · REAL PLAN creado");
+            ui.toast("Colocación guardada · REAL PLAN listo · ahora VISUALIZAR ✦");
           }
         }}
         className="mt-3 w-full h-10 bg-ivory text-graphite-0 text-[11px] tracking-[0.16em] uppercase font-medium hover:bg-offwhite transition-colors disabled:opacity-40"
@@ -334,6 +335,7 @@ function VisualizeSection() {
       >
         {generating ? "Visualizando…" : "Visualizar ✦"}
       </button>
+      <Equation className="mt-3 !text-[9px] !gap-1.5 flex-wrap" />
       <div className="flex items-center justify-between mt-2">
         <span className="t-label">{choice === "REALITY" ? "Realidad" : "Arquitectura"}</span>
         <button type="button" className="t-label hover:text-ivory transition-colors" onClick={() => ui.setOptionsOpen(!optionsOpen)}>
@@ -350,7 +352,7 @@ function VisualizeSection() {
               className={`w-full text-left px-3 py-2 flex items-center justify-between hover:bg-graphite-3 transition-colors ${choice === c ? "text-ivory" : "text-warm-grey"}`}
             >
               <span className="text-[11px] tracking-[0.12em] uppercase">{c === "REALITY" ? "Realidad" : "Arquitectura"}</span>
-              <span className="text-[10px] text-warm-grey">{c === "REALITY" ? "producto en tu foto" : "presentación arquitectónica"}</span>
+              <span className="text-[10px] text-warm-grey">{c === "REALITY" ? "tu foto, editada" : "visualización estilizada"}</span>
             </button>
           ))}
         </div>

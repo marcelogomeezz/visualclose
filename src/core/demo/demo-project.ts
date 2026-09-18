@@ -28,11 +28,30 @@ export function createEmptyProject(name = "Proyecto sin título", pack: ProductP
       lockedAt: null,
     },
     geometryReference: null,
+    placementReference: null,
+    placementMask: null,
+    placementAssetsRevision: null,
+    maskSettings: { ...DEFAULT_MASK_SETTINGS },
     sceneLock: null,
     productDNA: null,
     outputs: [],
     presentation: { prospectName: "", prospectLogo: null, aspect: "16:9" },
   };
+}
+
+export const DEFAULT_MASK_SETTINGS = { paddingPx: 24, shadowReach: 0.9 } as const;
+
+/** Fills fields added after a project was stored. Safe to call on any project. */
+export function migrateProject(stored: Partial<Project> & Pick<Project, "id" | "name">): Project {
+  const base = createEmptyProject(stored.name);
+  return {
+    ...base,
+    ...stored,
+    placementReference: stored.placementReference ?? null,
+    placementMask: stored.placementMask ?? null,
+    placementAssetsRevision: stored.placementAssetsRevision ?? null,
+    maskSettings: stored.maskSettings ?? { ...DEFAULT_MASK_SETTINGS },
+  } as Project;
 }
 
 /**

@@ -73,6 +73,27 @@ export interface OutputRecord {
   favorite: boolean;
   /** True when the output shares the exact framing of the source photograph. */
   registered: boolean;
+  /** Background preservation estimate for REALITY outputs, when it could be computed. */
+  preservation?: PreservationReport;
+}
+
+/** How the editable region is derived from the placement volume. */
+export interface MaskSettings {
+  /** Extra room around the product for shadows, occlusion and contact, in source-image pixels. */
+  paddingPx: number;
+  /** Ground shadow reach as a fraction of the product height. */
+  shadowReach: number;
+}
+
+/** Internal estimate of how much of the photograph outside the mask changed. Never a pixel-perfect guarantee. */
+export interface PreservationReport {
+  /** Share of pixels outside the mask whose colour moved beyond the tolerance. 0 = untouched. */
+  outsideChangedRatio: number;
+  /** Mean absolute colour difference outside the mask (0..255). */
+  outsideMeanDiff: number;
+  threshold: number;
+  passed: boolean;
+  note: string;
 }
 
 export type PresentAspect = "16:9" | "9:16" | "1:1";
@@ -96,6 +117,13 @@ export interface Project {
   referenceMeasurement: ReferenceMeasurement | null;
   placement: Placement;
   geometryReference: GeometryReference | null;
+  /** Original photograph with a clean placement outline. An AI input, never a user-facing output. */
+  placementReference: AssetRef | null;
+  /** White-on-black editable region derived from the placement volume. An AI input. */
+  placementMask: AssetRef | null;
+  /** Revision the placement assets were generated from. */
+  placementAssetsRevision: number | null;
+  maskSettings: MaskSettings;
   sceneLock: SceneLock | null;
   productDNA: ProductDNA | null;
   outputs: OutputRecord[];

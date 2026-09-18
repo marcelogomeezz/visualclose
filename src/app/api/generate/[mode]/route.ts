@@ -2,13 +2,12 @@ import { NextResponse } from "next/server";
 import { getAIProvider } from "@/providers/ai";
 import { getGenerationProvider } from "@/providers/generation";
 import type { RenderBriefInput } from "@/providers/ai/types";
+import type { RealityEditRequest } from "@/providers/generation/types";
 
+/** The client sends descriptors only; pixels stay in the browser until a real provider is connected. */
 interface GenerateBody {
   briefInput: RenderBriefInput;
-  productPackId: string;
-  spaceAssetId: string | null;
-  spaceIsDemoAsset: boolean;
-  variant?: string;
+  request: Omit<RealityEditRequest, "brief">;
 }
 
 const MODES = new Set(["reality", "archviz", "motion"]);
@@ -21,9 +20,9 @@ export async function POST(request: Request, context: { params: Promise<{ mode: 
     const ai = getAIProvider();
     const gen = getGenerationProvider();
     const brief = await ai.createRenderBrief({ ...body.briefInput, mode: mode.toUpperCase() as RenderBriefInput["mode"] });
-    const req = { brief, productPackId: body.productPackId, spaceAssetId: body.spaceAssetId, spaceIsDemoAsset: body.spaceIsDemoAsset, variant: body.variant };
+    const req: RealityEditRequest = { ...body.request, brief };
     const result = mode === "reality" ? await gen.generateReality(req) : mode === "archviz" ? await gen.generateArchviz(req) : await gen.generateMotion(req);
-    const validation = await ai.validateResult({ brief, outputAssetUrl: result.assetUrl });
+    const validation = result.kind === "edited-photo" ? await ai.validateResult({ brief, outputAssetUrl: result.assetUrl }) : null;
     return NextResponse.json({ result, brief, validation, provider: gen.id });
   } catch (error) {
     return NextResponse.json({ error: error instanceof Error ? error.message : "Generation failed" }, { status: 503 });

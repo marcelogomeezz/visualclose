@@ -20,6 +20,6 @@ export const travertineFacade: ProductPack = {
     { label: "Cavity", value: "40 mm ventilated" },
   ],
   placementType: "WALL_SURFACE",
-  notes: "Surface transformation demo pack. Assets are placeholders.",
+  notes: "Surface transformation demo pack. PLACEHOLDER: reference drawings are synthetic, not photographs.",
   productDNA: null,
 };

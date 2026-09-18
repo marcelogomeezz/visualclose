@@ -142,6 +142,43 @@ export function AdvancedSheet() {
         )}
       </Section>
 
+      <Section title="Región de edición" aside={project.placementAssetsRevision === project.revision ? <span className="t-label text-champagne">al día</span> : <span className="t-label">pendiente</span>}>
+        <div className="text-[11px] text-warm-grey mb-3 leading-snug">
+          La foto original es la fuente de verdad. La IA solo puede cambiar la máscara; la referencia de colocación guía la perspectiva. Ninguna de las dos es una salida.
+        </div>
+        <div className="grid grid-cols-2 gap-2 mb-3">
+          {[
+            ["Referencia de colocación", project.placementReference],
+            ["Máscara de edición", project.placementMask],
+          ].map(([label, asset]) => (
+            <div key={label as string}>
+              <div className="t-label mb-1">{label as string}</div>
+              <div className="aspect-[3/2] bg-graphite-0 border border-line overflow-hidden">
+                {asset && typeof asset === "object" && asset.url ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={asset.url} alt="" className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-[10px] text-warm-grey-2">Se genera al pulsar LISTO</div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="flex items-center gap-3">
+          <span className="t-label w-24">Margen</span>
+          <input type="range" className="vc-range" min={0} max={120} step={4} value={project.maskSettings.paddingPx} onChange={(e) => actions.setMaskSettings({ paddingPx: Number(e.target.value) })} />
+          <span className="t-mono text-[10.5px] w-12 text-right">{project.maskSettings.paddingPx}px</span>
+        </div>
+        <div className="flex items-center gap-3 mt-1">
+          <span className="t-label w-24">Sombra</span>
+          <input type="range" className="vc-range" min={0} max={2} step={0.1} value={project.maskSettings.shadowReach} onChange={(e) => actions.setMaskSettings({ shadowReach: Number(e.target.value) })} />
+          <span className="t-mono text-[10.5px] w-12 text-right">{project.maskSettings.shadowReach.toFixed(1)}×</span>
+        </div>
+        <Button size="sm" variant="outline" className="mt-3" disabled={!solve} onClick={() => void actions.ensurePlacementAssets(true).then((ok) => ui.toast(ok ? "Máscara y referencia regeneradas" : "No se pudo generar la máscara"))}>
+          Regenerar
+        </Button>
+      </Section>
+
       {displayed && (
         <Section title={outputLabel(displayed.type, displayed.index)} aside={<span className="t-label">{formatTime(displayed.createdAt)}</span>}>
           <Row label="Proveedor">{displayed.provenance.provider}</Row>
@@ -155,6 +192,14 @@ export function AdvancedSheet() {
             <span className="t-mono">{formatDimensions(displayed.settings.dimensions.width, displayed.settings.dimensions.depth, displayed.settings.dimensions.height, displayed.settings.dimensions.units)}</span>
           </Row>
           <Row label="Alineado con la foto">{displayed.registered ? "Sí" : "No"}</Row>
+          {displayed.preservation && (
+            <Row label="Fondo conservado">
+              <span className={`t-mono ${displayed.preservation.passed ? "text-champagne" : "text-danger"}`}>
+                {(100 - displayed.preservation.outsideChangedRatio * 100).toFixed(2)}% · {displayed.preservation.passed ? "ok" : "revisar"}
+              </span>
+            </Row>
+          )}
+          {displayed.preservation && <div className="text-[10.5px] text-warm-grey-2 pt-1">Estimación interna fuera de la máscara. No es una garantía píxel a píxel.</div>}
           {displayed.provenance.note && <div className="text-[10.5px] text-warm-grey pt-1">{displayed.provenance.note}</div>}
           <div className="flex gap-2 mt-3">
             <Button size="sm" variant="outline" onClick={() => actions.toggleFavorite(displayed.id)}>

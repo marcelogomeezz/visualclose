@@ -20,6 +20,6 @@ export const lineaKitchen: ProductPack = {
     { label: "Appliances", value: "Integrated, panel-ready" },
   ],
   placementType: "WALL_ATTACHED_STRUCTURE",
-  notes: "Interior installation demo pack. Assets are placeholders.",
+  notes: "Interior installation demo pack. PLACEHOLDER: reference drawings are synthetic, not photographs.",
   productDNA: null,
 };

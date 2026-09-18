@@ -115,31 +115,42 @@ const d2 = await dims();
 check(d2.width !== d.width || d2.depth !== d.depth, `TAMAÑO corner drag changes dimensions (${d.width}×${d.depth} → ${d2.width}×${d2.depth})`);
 // done → REAL PLAN
 await page.getByRole("button", { name: /Listo/i }).click();
-await page.getByText("Real plan", { exact: false }).first().waitFor({ timeout: 8000 });
+await page.getByText("Colocación guardada ✓").first().waitFor({ timeout: 10000 });
 await wait(800);
-check((await page.locator("footer").getByText("REAL PLAN").count()) >= 1, "LISTO ✓ creates the REAL PLAN and opens it");
+check((await page.locator("main canvas").count()) === 0, "LISTO ✓ hides the 3D guide and returns to the clean photograph");
+check(await page.locator("main").getByText("ORIGINAL", { exact: true }).isVisible(), "canvas shows ORIGINAL after LISTO");
 
 // ---------------------------------------------------------------- 5. visualize → REALIDAD
 await page.getByRole("button", { name: /^Visualizar/i }).click();
 await wait(600);
 check(await page.getByText("Visualizando…").isVisible(), "generation state shown on the button");
-await page.locator("main img.vc-fade-in").first().waitFor({ timeout: 15000 });
+await page.locator("main img.vc-fade-in").first().waitFor({ timeout: 30000 });
 await wait(400);
 check(await page.locator("footer button", { hasText: "REALIDAD" }).first().evaluate((b) => b.className.includes("border-ivory")), "REALIDAD tab active with the new output");
-check(await page.getByText("no alineado con tu foto").isVisible(), "uploaded space: mock output is honestly flagged as not aligned");
+check(await page.locator("main").getByText("muestra", { exact: true }).isVisible(), "REALIDAD on an uploaded photo is labelled as a sample (muestra)");
+check(await page.getByRole("button", { name: /Antes \/ Después/i }).isVisible(), "uploaded photo: REALIDAD is registered to the same photo, so Antes / Después is available");
+// The photograph is the source of truth: outside the mask, pixels must equal the original.
+await page.getByRole("button", { name: "Más", exact: true }).click();
+await page.getByRole("button", { name: /^Avanzado$/i }).click();
+await wait(500);
+const preserved = await page.getByText("Fondo conservado").locator("..").textContent();
+check(!!preserved && /100\.00%/.test(preserved), `preservation estimate outside the mask: ${preserved?.trim()}`);
+check(await page.locator("img[src*='blob:']").count() >= 2, "placement reference and mask are stored as separate assets");
+await page.keyboard.press("Escape");
+await wait(300);
 
 // ---------------------------------------------------------------- 6. REAL PLAN view
 await page.locator("footer button", { hasText: "REAL PLAN" }).first().click();
 await wait(500);
 check(await page.getByText("Visualización de referencia").isVisible(), "REAL PLAN view shows the reference note");
-check((await page.locator("main canvas").count()) >= 1, "REAL PLAN view renders the 3D placement layer");
+check((await page.locator("main svg").count()) >= 1 && (await page.locator("main canvas").count()) === 0, "REAL PLAN is the photograph plus an SVG overlay, no WebGL");
 
 // ---------------------------------------------------------------- 7. before / after (needs a registered output → demo project)
 await page.getByRole("button", { name: "Más", exact: true }).click();
 await page.getByRole("button", { name: /Cargar demo/i }).click();
 await wait(800);
 await page.getByRole("button", { name: /^Visualizar/i }).click();
-await page.locator("main img.vc-fade-in").first().waitFor({ timeout: 15000 });
+await page.locator("main img.vc-fade-in").first().waitFor({ timeout: 30000 });
 await wait(400);
 await page.getByRole("button", { name: /Antes \/ Después/i }).click();
 await wait(400);
@@ -158,6 +169,8 @@ await page.getByRole("button", { name: /Ajustar en el espacio/i }).click();
 await wait(400);
 await page.getByRole("button", { name: /Listo/i }).click();
 await wait(1200);
+await page.locator("footer button", { hasText: "REAL PLAN" }).first().click();
+await wait(600);
 await shot(page, "studio-realplan");
 
 // ---------------------------------------------------------------- present

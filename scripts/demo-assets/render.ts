@@ -1,6 +1,7 @@
 /**
- * Renders the placeholder demo assets to public/demo and writes the generated
- * demo footprint used by the demo project.
+ * Renders the PLACEHOLDER demo assets to public/demo and writes the generated demo footprint.
+ * These are synthetic drawings, not photographs. No pre-rendered REALITY is produced: REALIDAD is
+ * always composed over the original photograph at runtime (see src/lib/reality-composite.ts).
  *
  *   npx tsx scripts/demo-assets/render.ts
  */
@@ -23,7 +24,6 @@ type Job = { file: string; svg: string; width: number; height: number };
 
 const jobs: Job[] = [
   { file: "pergola/space.jpg", svg: sceneSvg("space"), width: IMG_W, height: IMG_H },
-  { file: "pergola/reality.jpg", svg: sceneSvg("reality"), width: IMG_W, height: IMG_H },
   { file: "pergola/archviz.jpg", svg: sceneSvg("archviz"), width: IMG_W, height: IMG_H },
   { file: "pergola/ref-front.jpg", svg: refs.pergolaFront(), width: 1600, height: 1200 },
   { file: "pergola/ref-side.jpg", svg: refs.pergolaSide(), width: 1600, height: 1200 },
@@ -35,7 +35,6 @@ const jobs: Job[] = [
   { file: "facade/ref-detail.jpg", svg: refs.facadeDetail(), width: 1600, height: 1200 },
   { file: "lounge/ref-front.jpg", svg: refs.loungeFront(), width: 1600, height: 1200 },
   { file: "lounge/ref-material.jpg", svg: refs.loungeMaterial(), width: 1600, height: 1200 },
-  { file: "generic/reality.jpg", svg: refs.genericOutput("REALITY"), width: 1920, height: 1280 },
   { file: "generic/archviz.jpg", svg: refs.genericOutput("ARCHVIZ"), width: 1920, height: 1280 },
 ];
 

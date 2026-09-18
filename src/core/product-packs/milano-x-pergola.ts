@@ -23,10 +23,10 @@ export const milanoXPergola: ProductPack = {
     { label: "Options", value: "Perimeter LED, side screens" },
   ],
   placementType: "FREESTANDING_STRUCTURE",
-  notes: "First demo Product Pack. Assets are placeholders.",
+  notes: "PLACEHOLDER: first demo Product Pack. Reference drawings are synthetic, not photographs.",
   productDNA: null,
   demoOutputs: {
-    reality: "/demo/pergola/reality.jpg",
+    // PLACEHOLDER synthetic art for the secondary ARQUITECTURA output only. REALIDAD is never pre-rendered.
     archviz: "/demo/pergola/archviz.jpg",
   },
 };

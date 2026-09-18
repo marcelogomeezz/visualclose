@@ -1,10 +1,12 @@
 import { ProviderNotConfiguredError } from "../errors";
-import type { GenerationProvider, GenerationRequest, GenerationResult } from "./types";
+import type { ArchitectureRequest, GenerationProvider, GenerationResult, MotionRequest, RealityEditRequest } from "./types";
 
 /**
  * Placeholder for the verified Higgsfield API integration.
- * Credentials come from the server environment only. Endpoints and model identifiers are
- * intentionally absent until they are confirmed against the official API documentation.
+ * REALITY will be an image EDIT: the original photograph plus the placement mask and reference go in,
+ * the same photograph with the product installed comes back. Credentials come from the server
+ * environment only. Endpoints and model identifiers are intentionally absent until they are
+ * confirmed against the official API documentation.
  */
 export class HiggsfieldProvider implements GenerationProvider {
   readonly id = "higgsfield" as const;
@@ -16,15 +18,15 @@ export class HiggsfieldProvider implements GenerationProvider {
     throw new ProviderNotConfiguredError("higgsfield (implementation pending)");
   }
 
-  async generateReality(_req: GenerationRequest): Promise<GenerationResult> {
+  async generateReality(_req: RealityEditRequest): Promise<GenerationResult> {
     return this.ensure();
   }
 
-  async generateArchviz(_req: GenerationRequest): Promise<GenerationResult> {
+  async generateArchviz(_req: ArchitectureRequest): Promise<GenerationResult> {
     return this.ensure();
   }
 
-  async generateMotion(_req: GenerationRequest): Promise<GenerationResult> {
+  async generateMotion(_req: MotionRequest): Promise<GenerationResult> {
     return this.ensure();
   }
 }
