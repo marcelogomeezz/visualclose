@@ -8,6 +8,6 @@ export async function POST(request: Request) {
     const brief = await getAIProvider().createRenderBrief(input);
     return NextResponse.json({ brief });
   } catch (error) {
-    return NextResponse.json({ error: error instanceof Error ? error.message : "Brief creation failed" }, { status: 503 });
+    return NextResponse.json({ error: error instanceof Error ? error.message : "No se pudo crear el resumen de generación" }, { status: 503 });
   }
 }

@@ -15,14 +15,14 @@ export const PLACEMENT_TYPES = [
 export type PlacementType = (typeof PLACEMENT_TYPES)[number];
 
 export const PLACEMENT_TYPE_LABELS: Record<PlacementType, string> = {
-  FREESTANDING_STRUCTURE: "Freestanding structure",
-  WALL_ATTACHED_STRUCTURE: "Wall-attached structure",
-  FLOOR_OBJECT: "Floor object",
-  WALL_SURFACE: "Wall surface",
-  FLOOR_SURFACE: "Floor surface",
-  OBJECT_REPLACEMENT: "Object replacement",
-  ROOM_TRANSFORMATION: "Room transformation",
-  CUSTOM: "Custom",
+  FREESTANDING_STRUCTURE: "Estructura independiente",
+  WALL_ATTACHED_STRUCTURE: "Estructura anclada a pared",
+  FLOOR_OBJECT: "Objeto de suelo",
+  WALL_SURFACE: "Revestimiento de pared",
+  FLOOR_SURFACE: "Revestimiento de suelo",
+  OBJECT_REPLACEMENT: "Sustitución de objeto",
+  ROOM_TRANSFORMATION: "Transformación de estancia",
+  CUSTOM: "Personalizado",
 };
 
 export const REFERENCE_TYPES = [
@@ -50,15 +50,15 @@ export const PRODUCT_CATEGORIES = [
 export type ProductCategory = (typeof PRODUCT_CATEGORIES)[number];
 
 export const CATEGORY_LABELS: Record<ProductCategory, string> = {
-  OUTDOOR_STRUCTURE: "Outdoor structure",
-  INTERIOR_INSTALLATION: "Interior installation",
-  SURFACE_TRANSFORMATION: "Surface transformation",
-  STANDALONE_PRODUCT: "Standalone product",
-  POOL_AND_WATER: "Pool & water",
-  OPENINGS: "Windows & doors",
-  LANDSCAPE: "Landscape",
-  COMMERCIAL: "Commercial",
-  OTHER: "Other",
+  OUTDOOR_STRUCTURE: "Estructura exterior",
+  INTERIOR_INSTALLATION: "Instalación interior",
+  SURFACE_TRANSFORMATION: "Transformación de superficie",
+  STANDALONE_PRODUCT: "Producto independiente",
+  POOL_AND_WATER: "Piscina y agua",
+  OPENINGS: "Ventanas y puertas",
+  LANDSCAPE: "Paisajismo",
+  COMMERCIAL: "Comercial",
+  OTHER: "Otro",
 };
 
 export interface Dimensions {

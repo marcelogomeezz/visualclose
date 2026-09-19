@@ -45,9 +45,9 @@ export function TransitionCurtain() {
   }, [phase, pathname]);
 
   return (
-    <div ref={ref} className="fixed inset-0 z-[80] bg-graphite-0 hidden pointer-events-none">
+    <div ref={ref} className="fixed inset-0 z-[80] bg-stone hidden pointer-events-none">
       <div ref={markRef} className="absolute inset-0 flex items-center justify-center">
-        <span className="text-[12px] tracking-[0.42em] text-ivory">VISUALCLOSE</span>
+        <span className="text-[12px] tracking-[0.42em] text-ink">VISUALCLOSE</span>
       </div>
     </div>
   );

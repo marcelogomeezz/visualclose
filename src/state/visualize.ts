@@ -22,12 +22,12 @@ function describe(asset: AssetRef): AssetDescriptor {
 export function preservationRules(sceneLock: SceneLock | null): ScenePreservationRules {
   const preserve = sceneLock
     ? [...sceneLock.preserve.architecture, ...sceneLock.preserve.doors, ...sceneLock.preserve.windows, sceneLock.preserve.floor, ...sceneLock.preserve.walls, ...sceneLock.preserve.landscaping, sceneLock.preserve.background, ...sceneLock.preserve.importantObjects]
-    : ["Camera viewpoint and framing", "Architecture, walls, windows, doors", "Floor and landscape", "Sky and background", "Existing objects outside the installation region"];
+    : ["Punto de vista y encuadre de la cámara", "Arquitectura, paredes, ventanas, puertas", "Suelo y paisajismo", "Cielo y fondo", "Objetos existentes fuera de la región de instalación"];
   return {
     preserve,
     editableRegion: "placement-mask",
     allowedContactEffects: ["shadows", "reflections", "occlusion", "contact", "lighting"],
-    notes: ["The original photograph is the source of truth.", "Only the placement mask may change; contact effects stay inside its padding."],
+    notes: ["La fotografía original es la fuente de verdad.", "Solo puede cambiar la máscara de colocación; los efectos de contacto se mantienen dentro de su margen."],
   };
 }
 

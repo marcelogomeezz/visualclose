@@ -11,7 +11,7 @@ export function Experience() {
     ScrollTrigger.refresh();
   }, []);
   return (
-    <div className="bg-graphite-0 text-ivory">
+    <div className="bg-stone text-ink">
       <Nav />
       <Hero />
       <StorySection />

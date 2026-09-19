@@ -8,6 +8,6 @@ export async function POST(request: Request) {
     const productDNA = await getAIProvider().analyzeProduct(input);
     return NextResponse.json({ productDNA, provider: getAIProvider().id });
   } catch (error) {
-    return NextResponse.json({ error: error instanceof Error ? error.message : "Product analysis failed" }, { status: 503 });
+    return NextResponse.json({ error: error instanceof Error ? error.message : "El análisis de producto ha fallado" }, { status: 503 });
   }
 }

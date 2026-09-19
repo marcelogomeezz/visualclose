@@ -58,18 +58,18 @@ export function StudioCanvas() {
   const downloadable = (isVisual && visualOutput) || (mode === "TECHNICAL" && displayed) ? displayed : null;
 
   return (
-    <main className="relative bg-graphite-0 h-full min-h-0 overflow-hidden">
+    <main className="relative bg-stone h-full min-h-0 overflow-hidden">
       {!space ? (
         <div className="absolute inset-0 flex items-center justify-center p-8">
-          <DropZone onFiles={(f) => void actions.setSpace(f[0])} className="w-full max-w-[560px]">
+          <DropZone onFiles={(f) => void actions.setSpace(f[0])} className="w-full max-w-[560px] rounded-2xl">
             <div className="py-14 text-center">
-              <div className="t-editorial text-[30px] md:text-[36px] text-ivory mb-3">Empieza con tu espacio real.</div>
-              <div className="text-[12px] text-warm-grey">Arrastra una foto de tu espacio aquí.</div>
+              <div className="t-editorial text-[30px] md:text-[36px] text-ink mb-3">Empieza con tu espacio real.</div>
+              <div className="text-[12px] text-muted">Arrastra una foto de tu espacio aquí.</div>
             </div>
           </DropZone>
           <button
             type="button"
-            className="absolute bottom-6 t-label hover:text-ivory transition-colors"
+            className="absolute bottom-6 t-label hover:text-ink transition-colors"
             onClick={() => {
               actions.loadDemoProject();
               ui.resetViewport();
@@ -97,9 +97,9 @@ export function StudioCanvas() {
                     <img src={space.asset.url} alt="" className="absolute inset-0 w-full h-full" draggable={false} />
                     {!generating && (
                       <div className="absolute inset-x-0 bottom-6 flex justify-center pointer-events-none">
-                        <div className="text-center bg-graphite-0/70 border border-line px-6 py-3.5">
+                        <div className="text-center bg-white/95 rounded-2xl shadow-md px-6 py-4">
                           <Equation />
-                          <div className="text-[11px] text-warm-grey mt-1.5">Pulsa VISUALIZAR ✦ y el producto aparecerá en esta misma foto.</div>
+                          <div className="text-[11px] text-muted mt-1.5">Pulsa VISUALIZAR ✦ y el producto aparecerá en esta misma foto.</div>
                         </div>
                       </div>
                     )}
@@ -110,9 +110,9 @@ export function StudioCanvas() {
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={space.asset.url} alt="" className="absolute inset-0 w-full h-full" draggable={false} />
                   <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                    <div className="border border-line-strong px-8 py-6 text-center bg-graphite-0/70">
+                    <div className="rounded-2xl shadow-md px-8 py-6 text-center bg-white/95">
                       <div className="t-label-strong mb-1">Movimiento</div>
-                      <div className="text-[11px] text-warm-grey">Próximamente.</div>
+                      <div className="text-[11px] text-muted">Próximamente.</div>
                     </div>
                   </div>
                 </>
@@ -140,22 +140,22 @@ export function StudioCanvas() {
       {space && mode === "TECHNICAL" && <RealPlanFrame project={project} />}
       {space && mode !== "TECHNICAL" && !generating && (
         <div className="absolute top-4 left-5 z-20 pointer-events-none flex items-center gap-2">
-          <span className="t-label-strong bg-graphite-0/60 px-2 py-1">{MODE_LABELS[mode]}</span>
-          {isVisual && visualOutput?.provenance.provider === "mock" && <span className="t-label text-champagne bg-graphite-0/60 px-2 py-1">muestra</span>}
-          <span className="text-[11px] text-warm-grey hidden md:inline">{MODE_COPY[mode]}</span>
+          <span className="t-label-strong bg-white/90 rounded-full px-3 py-1.5 shadow-sm">{MODE_LABELS[mode]}</span>
+          {isVisual && visualOutput?.provenance.provider === "mock" && <span className="t-label text-accent bg-white/90 rounded-full px-3 py-1.5 shadow-sm">muestra</span>}
+          <span className="text-[11px] text-muted hidden md:inline">{MODE_COPY[mode]}</span>
         </div>
       )}
       {space && mode === "FIT" && !solve && (
-        <div className="absolute bottom-5 left-5 z-20 text-[11px] text-champagne bg-graphite-0/70 px-3 py-1.5 border border-line">Las esquinas están alineadas. Sepáralas para colocar el producto.</div>
+        <div className="absolute bottom-5 left-5 z-20 text-[11px] text-accent bg-white/95 rounded-xl px-3.5 py-2 shadow-sm">Las esquinas están alineadas. Sepáralas para colocar el producto.</div>
       )}
       {space && pickTool && (
-        <div className="absolute bottom-5 left-5 z-20 text-[11px] text-ivory bg-graphite-0/70 px-3 py-1.5 border border-line">
+        <div className="absolute bottom-5 left-5 z-20 text-[11px] text-ink bg-white/95 rounded-xl px-3.5 py-2 shadow-sm">
           {pickTool === "measure-a" ? "Marca el punto A en la foto" : pickTool === "measure-b" ? "Marca el punto B" : "Marca la línea de pared"}
-          <span className="text-warm-grey"> · Esc para cancelar</span>
+          <span className="text-muted"> · Esc para cancelar</span>
         </div>
       )}
       {space && zoom > 1 && !pickTool && (
-        <div className="absolute bottom-5 left-5 z-20 t-mono text-[10px] text-warm-grey bg-graphite-0/60 px-2 py-1">{Math.round(zoom * 100)}% · doble clic para volver</div>
+        <div className="absolute bottom-5 left-5 z-20 t-mono text-[10px] text-muted bg-white/95 rounded-full px-3 py-1.5 shadow-sm">{Math.round(zoom * 100)}% · doble clic para volver</div>
       )}
 
       {space && (isVisual || mode === "TECHNICAL") && (
@@ -164,18 +164,18 @@ export function StudioCanvas() {
             <button
               type="button"
               onClick={() => ui.setCompare(!compare)}
-              className={`h-8 px-3 text-[10.5px] tracking-[0.14em] uppercase border transition-colors ${compare ? "bg-ivory text-graphite-0 border-ivory" : "text-ivory border-line-strong bg-graphite-0/60 hover:bg-graphite-3"}`}
+              className={`h-9 px-4 rounded-full text-[11px] font-medium transition-colors shadow-sm ${compare ? "bg-ink text-white" : "text-ink bg-white/95 hover:bg-stone"}`}
             >
               {compare ? "Salir" : "Antes / Después"}
             </button>
           )}
-          {isVisual && visualOutput && !canCompare && <span className="t-label bg-graphite-0/60 px-2 py-1">Muestra · no alineada con tu foto</span>}
+          {isVisual && visualOutput && !canCompare && <span className="t-label bg-white/90 rounded-full px-3 py-1.5 shadow-sm">Muestra · no alineada con tu foto</span>}
           {downloadable && (
             <button
               type="button"
               title="Descargar"
               onClick={() => void downloadAsset(downloadable.asset.url, `${outputLabel(downloadable.type, downloadable.index).toLowerCase().replace(/\s+/g, "-")}.${downloadable.asset.mime === "image/png" ? "png" : "jpg"}`)}
-              className="h-8 w-8 flex items-center justify-center border border-line-strong bg-graphite-0/60 text-ivory hover:bg-graphite-3 transition-colors"
+              className="h-9 w-9 rounded-full flex items-center justify-center bg-white/95 text-ink hover:bg-stone transition-colors shadow-sm"
             >
               <Icon.Download />
             </button>
@@ -191,11 +191,11 @@ export function StudioCanvas() {
 export function Equation({ className = "" }: { className?: string }) {
   return (
     <div className={`flex items-center justify-center gap-2.5 text-[10.5px] tracking-[0.16em] uppercase ${className}`}>
-      <span className="text-ivory">Tu foto</span>
-      <span className="text-warm-grey">+</span>
-      <span className="text-ivory">Tu producto</span>
-      <span className="text-warm-grey">=</span>
-      <span className="text-champagne">Tu foto con el producto</span>
+      <span className="text-ink">Tu foto</span>
+      <span className="text-muted">+</span>
+      <span className="text-ink">Tu producto</span>
+      <span className="text-muted">=</span>
+      <span className="text-accent">Tu foto con el producto</span>
     </div>
   );
 }

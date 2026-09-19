@@ -129,7 +129,7 @@ export function PhotoViewport({
       {sw > 0 && (
         <div
           ref={stageRef}
-          className="vc-stage relative bg-graphite-0"
+          className="vc-stage relative bg-stone"
           style={{
             width: sw,
             height: sh,

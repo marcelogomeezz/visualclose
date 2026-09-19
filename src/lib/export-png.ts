@@ -153,7 +153,7 @@ export async function renderTechnicalPng(project: Project, solve: CameraSolve): 
     project.productPack.installationType,
   ].join("   ·   ");
   ctx.fillText(config, pad, H - pad - smallPx * 1.9);
-  ctx.fillText(`REAL PLAN   ·   ${TECHNICAL_NOTE}`, pad, H - pad - smallPx * 0.3);
+  ctx.fillText(`PLANO REAL   ·   ${TECHNICAL_NOTE}`, pad, H - pad - smallPx * 0.3);
   ctx.textAlign = "right";
   ctx.fillStyle = IVORY;
   ctx.font = `500 ${smallPx}px "Helvetica Neue", Helvetica, Arial, sans-serif`;

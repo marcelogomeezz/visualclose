@@ -8,6 +8,6 @@ export async function POST(request: Request) {
     const result = await getAIProvider().validateResult(input);
     return NextResponse.json({ result });
   } catch (error) {
-    return NextResponse.json({ error: error instanceof Error ? error.message : "Validation failed" }, { status: 503 });
+    return NextResponse.json({ error: error instanceof Error ? error.message : "La validación ha fallado" }, { status: 503 });
   }
 }

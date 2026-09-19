@@ -3,11 +3,11 @@
 const W = 1600;
 const H = 1200;
 
-function frame(body: string, title: string, sub: string, bg = "#efece6"): string {
+function frame(body: string, title: string, sub: string, bg = "#f2eee4"): string {
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${bg}"/><stop offset="1" stop-color="#e3dfd7"/></linearGradient>
-    <filter id="grain"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2"/><feColorMatrix type="saturate" values="0"/><feComponentTransfer><feFuncA type="linear" slope="0.06"/></feComponentTransfer></filter>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${bg}"/><stop offset="1" stop-color="#e8e0d0"/></linearGradient>
+    <filter id="grain"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2"/><feColorMatrix type="saturate" values="0"/><feComponentTransfer><feFuncA type="linear" slope="0.045"/></feComponentTransfer></filter>
     <linearGradient id="metal" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2a2a2a"/><stop offset="0.5" stop-color="#151515"/><stop offset="1" stop-color="#303030"/></linearGradient>
     <linearGradient id="oak" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#b79a6d"/><stop offset="1" stop-color="#a3865c"/></linearGradient>
     <linearGradient id="stone" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#d9cdb8"/><stop offset="1" stop-color="#c3b59d"/></linearGradient>
@@ -36,7 +36,7 @@ export function pergolaFront(): string {
     <line x1="1290" y1="0" x2="1290" y2="620" stroke="#4a4741" stroke-width="1.5"/>
     <text x="1215" y="340" font-family="Helvetica, Arial, sans-serif" font-size="26" letter-spacing="3" fill="#4a4741">2.70 m</text>
   </g>`;
-  return frame(body, "MILANO X — FRONT ELEVATION", "Placeholder reference · replace with product photography");
+  return frame(body, "MILANO X · VISTA FRONTAL", "Referencia de producto · boceto ilustrativo");
 }
 
 export function pergolaSide(): string {
@@ -50,7 +50,7 @@ export function pergolaSide(): string {
     <line x1="0" y1="680" x2="960" y2="680" stroke="#4a4741" stroke-width="1.5"/>
     <text x="480" y="720" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="26" letter-spacing="3" fill="#4a4741">4.00 m</text>
   </g>`;
-  return frame(body, "MILANO X — SIDE ELEVATION", "Placeholder reference · retractable louvered roof");
+  return frame(body, "MILANO X · VISTA LATERAL", "Referencia de producto · techo de lamas retráctiles");
 }
 
 export function pergolaDetail(): string {
@@ -61,11 +61,11 @@ export function pergolaDetail(): string {
     <rect x="0" y="120" width="70" height="520" fill="url(#metal)"/>
     <circle cx="35" cy="200" r="6" fill="#3a3a3a"/><circle cx="35" cy="560" r="6" fill="#3a3a3a"/>
     <line x1="140" y1="330" x2="420" y2="330" stroke="#4a4741" stroke-width="1.5"/>
-    <text x="440" y="338" font-family="Helvetica, Arial, sans-serif" font-size="24" letter-spacing="2" fill="#4a4741">Louver blade · extruded aluminium</text>
+    <text x="440" y="338" font-family="Helvetica, Arial, sans-serif" font-size="24" letter-spacing="2" fill="#4a4741">Lama del techo · aluminio extruido</text>
     <line x1="140" y1="440" x2="420" y2="440" stroke="#4a4741" stroke-width="1.5"/>
-    <text x="440" y="448" font-family="Helvetica, Arial, sans-serif" font-size="24" letter-spacing="2" fill="#4a4741">Post 140 × 140 mm · matte black</text>
+    <text x="440" y="448" font-family="Helvetica, Arial, sans-serif" font-size="24" letter-spacing="2" fill="#4a4741">Poste 140 × 140 mm · negro mate</text>
   </g>`;
-  return frame(body, "MILANO X — DETAIL", "Placeholder reference · roof mechanism and post section");
+  return frame(body, "MILANO X · DETALLE", "Referencia de producto · mecanismo del techo y sección del poste");
 }
 
 export function pergolaMaterial(): string {
@@ -73,8 +73,8 @@ export function pergolaMaterial(): string {
   <rect x="200" y="200" width="1200" height="720" fill="url(#metal)"/>
   <rect x="200" y="200" width="1200" height="720" fill="none" stroke="#3a3a3a" stroke-width="2"/>
   ${Array.from({ length: 36 }, (_, i) => `<line x1="${200 + i * 34}" y1="200" x2="${200 + i * 34}" y2="920" stroke="#262626" stroke-width="1"/>`).join("")}
-  <text x="240" y="880" font-family="Helvetica, Arial, sans-serif" font-size="26" letter-spacing="4" fill="#9a958c">RAL 9005 · MATTE · POWDER COATED ALUMINIUM</text>`;
-  return frame(body, "MILANO X — MATERIAL", "Placeholder reference · finish swatch");
+  <text x="240" y="880" font-family="Helvetica, Arial, sans-serif" font-size="26" letter-spacing="4" fill="#9a958c">RAL 9005 · MATE · ALUMINIO LACADO EN POLVO</text>`;
+  return frame(body, "MILANO X · ACABADO", "Referencia de producto · muestra de acabado");
 }
 
 export function kitchenFront(): string {
@@ -89,7 +89,7 @@ export function kitchenFront(): string {
     <line x1="0" y1="760" x2="1280" y2="760" stroke="#4a4741" stroke-width="1.5"/>
     <text x="640" y="800" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="26" letter-spacing="3" fill="#4a4741">4.20 m</text>
   </g>`;
-  return frame(body, "LINEA KITCHEN SYSTEM — FRONT", "Placeholder reference · oak veneer uppers, graphite base, stone worktop");
+  return frame(body, "SISTEMA DE COCINA LINEA · VISTA FRONTAL", "Referencia de producto · muebles altos en roble, base grafito, encimera de piedra");
 }
 
 export function kitchenMaterial(): string {
@@ -98,9 +98,9 @@ export function kitchenMaterial(): string {
   ${Array.from({ length: 40 }, (_, i) => `<line x1="${160 + i * 15}" y1="200" x2="${160 + i * 15 + 30}" y2="920" stroke="#8b7148" stroke-width="1" opacity="0.5"/>`).join("")}
   <rect x="800" y="200" width="600" height="720" fill="url(#stone)"/>
   ${Array.from({ length: 14 }, (_, i) => `<path d="M ${800 + i * 45} 200 Q ${820 + i * 45} 560 ${790 + i * 45} 920" stroke="#a89a82" stroke-width="1.2" fill="none" opacity="0.6"/>`).join("")}
-  <text x="180" y="880" font-family="Helvetica, Arial, sans-serif" font-size="24" letter-spacing="3" fill="#4a3d2a">OAK VENEER</text>
-  <text x="820" y="880" font-family="Helvetica, Arial, sans-serif" font-size="24" letter-spacing="3" fill="#6b6050">HONED LIMESTONE</text>`;
-  return frame(body, "LINEA KITCHEN SYSTEM — MATERIALS", "Placeholder reference");
+  <text x="180" y="880" font-family="Helvetica, Arial, sans-serif" font-size="24" letter-spacing="3" fill="#4a3d2a">CHAPA DE ROBLE</text>
+  <text x="820" y="880" font-family="Helvetica, Arial, sans-serif" font-size="24" letter-spacing="3" fill="#6b6050">PIEDRA CALIZA PULIDA</text>`;
+  return frame(body, "SISTEMA DE COCINA LINEA · MATERIALES", "Referencia de producto");
 }
 
 export function facadePanels(): string {
@@ -116,8 +116,8 @@ export function facadePanels(): string {
     }).join("")}
     <clipPath id="clip"><rect x="0" y="0" width="1280" height="720"/></clipPath>
   </g>
-  <text x="180" y="960" font-family="Helvetica, Arial, sans-serif" font-size="24" letter-spacing="3" fill="#6b6050">TRAVERTINE · 1200 × 800 mm PANELS · STAGGERED</text>`;
-  return frame(body, "TRAVERTINE FACADE SYSTEM — PANEL PATTERN", "Placeholder reference · ventilated stone facade");
+  <text x="180" y="960" font-family="Helvetica, Arial, sans-serif" font-size="24" letter-spacing="3" fill="#6b6050">TRAVERTINO · PANELES 1200 × 800 mm · A MATAJUNTA</text>`;
+  return frame(body, "SISTEMA DE FACHADA TRAVERTINO · PATRÓN DE PANELES", "Referencia de producto · fachada ventilada de piedra");
 }
 
 export function facadeDetail(): string {
@@ -127,12 +127,12 @@ export function facadeDetail(): string {
     <rect x="80" y="0" width="60" height="700" fill="#3a3835"/>
     <rect x="140" y="0" width="120" height="700" fill="none" stroke="#4a4741" stroke-dasharray="8 8" stroke-width="1.5"/>
     <rect x="260" y="0" width="60" height="700" fill="url(#stone)"/>
-    <text x="360" y="120" font-family="Helvetica, Arial, sans-serif" font-size="24" letter-spacing="2" fill="#4a4741">Existing wall</text>
-    <text x="360" y="220" font-family="Helvetica, Arial, sans-serif" font-size="24" letter-spacing="2" fill="#4a4741">Aluminium sub-frame + insulation</text>
-    <text x="360" y="320" font-family="Helvetica, Arial, sans-serif" font-size="24" letter-spacing="2" fill="#4a4741">Ventilated cavity 40 mm</text>
-    <text x="360" y="420" font-family="Helvetica, Arial, sans-serif" font-size="24" letter-spacing="2" fill="#4a4741">Travertine panel 30 mm</text>
+    <text x="360" y="120" font-family="Helvetica, Arial, sans-serif" font-size="24" letter-spacing="2" fill="#4a4741">Muro existente</text>
+    <text x="360" y="220" font-family="Helvetica, Arial, sans-serif" font-size="24" letter-spacing="2" fill="#4a4741">Subestructura de aluminio + aislamiento</text>
+    <text x="360" y="320" font-family="Helvetica, Arial, sans-serif" font-size="24" letter-spacing="2" fill="#4a4741">Cámara ventilada de 40 mm</text>
+    <text x="360" y="420" font-family="Helvetica, Arial, sans-serif" font-size="24" letter-spacing="2" fill="#4a4741">Panel de travertino de 30 mm</text>
   </g>`;
-  return frame(body, "TRAVERTINE FACADE SYSTEM — SECTION", "Placeholder reference · not a construction drawing");
+  return frame(body, "SISTEMA DE FACHADA TRAVERTINO · SECCIÓN", "Referencia de producto · esquema ilustrativo");
 }
 
 export function loungeFront(): string {
@@ -148,7 +148,7 @@ export function loungeFront(): string {
     <line x1="0" y1="620" x2="1080" y2="620" stroke="#4a4741" stroke-width="1.5"/>
     <text x="540" y="660" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="26" letter-spacing="3" fill="#4a4741">2.40 m</text>
   </g>`;
-  return frame(body, "FORMA OUTDOOR LOUNGE — FRONT", "Placeholder reference · teak frame, outdoor fabric");
+  return frame(body, "LOUNGE EXTERIOR FORMA · VISTA FRONTAL", "Referencia de producto · estructura de teca, tapicería de exterior");
 }
 
 export function loungeMaterial(): string {
@@ -157,21 +157,22 @@ export function loungeMaterial(): string {
   ${Array.from({ length: 48 }, (_, i) => `<line x1="160" y1="${200 + i * 15}" x2="760" y2="${200 + i * 15}" stroke="#a89f8d" stroke-width="1" opacity="0.6"/>`).join("")}
   <rect x="800" y="200" width="600" height="720" fill="#9a7550"/>
   ${Array.from({ length: 20 }, (_, i) => `<line x1="${800 + i * 30}" y1="200" x2="${800 + i * 30 + 40}" y2="920" stroke="#7d5c3c" stroke-width="1.5" opacity="0.5"/>`).join("")}
-  <text x="180" y="880" font-family="Helvetica, Arial, sans-serif" font-size="24" letter-spacing="3" fill="#5a5245">OUTDOOR ACRYLIC · SAND</text>
-  <text x="820" y="880" font-family="Helvetica, Arial, sans-serif" font-size="24" letter-spacing="3" fill="#f3ebdf">TEAK · OILED</text>`;
-  return frame(body, "FORMA OUTDOOR LOUNGE — MATERIALS", "Placeholder reference");
+  <text x="180" y="880" font-family="Helvetica, Arial, sans-serif" font-size="24" letter-spacing="3" fill="#5a5245">ACRÍLICO DE EXTERIOR · ARENA</text>
+  <text x="820" y="880" font-family="Helvetica, Arial, sans-serif" font-size="24" letter-spacing="3" fill="#f3ebdf">TECA · ACEITADA</text>`;
+  return frame(body, "LOUNGE EXTERIOR FORMA · MATERIALES", "Referencia de producto");
 }
 
 /** Generic mock output used by the mock provider when no pack-specific placeholder exists. */
 export function genericOutput(kind: "REALITY" | "ARCHVIZ"): string {
   const bg = kind === "REALITY" ? "#1a1a1a" : "#221f1b";
+  const label = kind === "REALITY" ? "REALIDAD" : "ARQUITECTURA";
   return `<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1280" viewBox="0 0 1920 1280">
   <defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${bg}"/><stop offset="1" stop-color="#0f0f0f"/></linearGradient>
   <filter id="grain"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2"/><feColorMatrix type="saturate" values="0"/><feComponentTransfer><feFuncA type="linear" slope="0.08"/></feComponentTransfer></filter></defs>
   <rect width="1920" height="1280" fill="url(#g)"/>
   <rect width="1920" height="1280" filter="url(#grain)"/>
   <rect x="120" y="120" width="1680" height="1040" fill="none" stroke="#3a3835" stroke-width="1.5"/>
-  <text x="160" y="620" font-family="Helvetica, Arial, sans-serif" font-size="88" letter-spacing="10" fill="#e9e4da">${kind} · PLACEHOLDER</text>
-  <text x="160" y="690" font-family="Helvetica, Arial, sans-serif" font-size="30" letter-spacing="4" fill="#8a857c">MOCK OUTPUT · NOT REGISTERED TO THIS SPACE · REPLACE WITH PROVIDER RESULT</text>
+  <text x="160" y="620" font-family="Helvetica, Arial, sans-serif" font-size="88" letter-spacing="10" fill="#e9e4da">${label} · MUESTRA</text>
+  <text x="160" y="690" font-family="Helvetica, Arial, sans-serif" font-size="30" letter-spacing="4" fill="#8a857c">SALIDA SIMULADA · NO REGISTRADA EN ESTE ESPACIO · SE SUSTITUIRÁ POR EL RESULTADO DEL PROVEEDOR</text>
 </svg>`;
 }

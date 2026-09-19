@@ -52,7 +52,7 @@ export function Studio() {
 
   if (!ready) {
     return (
-      <div className="fixed inset-0 flex items-center justify-center bg-graphite-1">
+      <div className="fixed inset-0 flex items-center justify-center bg-paper">
         <span className="t-label-strong tracking-[0.3em]">VISUALCLOSE</span>
       </div>
     );
@@ -60,7 +60,7 @@ export function Studio() {
 
   return (
     <div
-      className="fixed inset-0 bg-graphite-1 text-ivory vc-fade-in overflow-hidden"
+      className="fixed inset-0 bg-paper text-ink vc-fade-in overflow-hidden"
       data-test-footprint={project ? JSON.stringify(project.placement.footprint) : undefined}
       data-test-dimensions={project ? JSON.stringify(project.dimensions) : undefined}
     >

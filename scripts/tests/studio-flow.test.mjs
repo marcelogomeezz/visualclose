@@ -126,7 +126,7 @@ await wait(600);
 check(await page.getByText("Visualizando…").isVisible(), "generation state shown on the button");
 await page.locator("main img.vc-fade-in").first().waitFor({ timeout: 30000 });
 await wait(400);
-check(await page.locator("footer button", { hasText: "REALIDAD" }).first().evaluate((b) => b.className.includes("border-ivory")), "REALIDAD tab active with the new output");
+check(await page.locator("footer button", { hasText: "REALIDAD" }).first().evaluate((b) => b.className.includes("bg-ink") && b.className.includes("text-white")), "REALIDAD tab active with the new output");
 check(await page.locator("main").getByText("muestra", { exact: true }).isVisible(), "REALIDAD on an uploaded photo is labelled as a sample (muestra)");
 check(await page.getByRole("button", { name: /Antes \/ Después/i }).isVisible(), "uploaded photo: REALIDAD is registered to the same photo, so Antes / Después is available");
 // The photograph is the source of truth: outside the mask, pixels must equal the original.
@@ -140,7 +140,7 @@ await page.keyboard.press("Escape");
 await wait(300);
 
 // ---------------------------------------------------------------- 6. REAL PLAN view
-await page.locator("footer button", { hasText: "REAL PLAN" }).first().click();
+await page.locator("footer button", { hasText: "PLANO REAL" }).first().click();
 await wait(500);
 check(await page.getByText("Visualización de referencia").isVisible(), "REAL PLAN view shows the reference note");
 check((await page.locator("main svg").count()) >= 1 && (await page.locator("main canvas").count()) === 0, "REAL PLAN is the photograph plus an SVG overlay, no WebGL");
@@ -169,7 +169,7 @@ await page.getByRole("button", { name: /Ajustar en el espacio/i }).click();
 await wait(400);
 await page.getByRole("button", { name: /Listo/i }).click();
 await wait(1200);
-await page.locator("footer button", { hasText: "REAL PLAN" }).first().click();
+await page.locator("footer button", { hasText: "PLANO REAL" }).first().click();
 await wait(600);
 await shot(page, "studio-realplan");
 

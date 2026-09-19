@@ -14,7 +14,7 @@ export function Segmented<T extends string>({
   className?: string;
 }) {
   return (
-    <div className={`inline-flex border border-line ${className}`} role="tablist">
+    <div className={`inline-flex rounded-lg border border-line overflow-hidden ${className}`} role="tablist">
       {options.map((o) => {
         const active = o.value === value;
         return (
@@ -25,8 +25,8 @@ export function Segmented<T extends string>({
             aria-selected={active}
             disabled={o.disabled}
             onClick={() => onChange(o.value)}
-            className={`${size === "sm" ? "h-7 px-2.5 text-[10.5px]" : "h-8 px-3 text-[11px]"} tracking-[0.12em] uppercase font-medium transition-colors duration-150 disabled:opacity-35 ${
-              active ? "bg-ivory text-graphite-0" : "text-warm-grey hover:text-ivory"
+            className={`${size === "sm" ? "h-7 px-2.5 text-[10.5px]" : "h-8 px-3 text-[11px]"} tracking-[0.06em] font-medium transition-colors duration-150 disabled:opacity-35 ${
+              active ? "bg-ink text-white" : "text-muted hover:text-ink"
             }`}
           >
             {o.label}

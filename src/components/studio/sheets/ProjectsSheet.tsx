@@ -30,9 +30,9 @@ export function ProjectsSheet() {
         {projects.map((p) => {
           const active = p.id === current?.id;
           return (
-            <li key={p.id} className={`px-5 py-3 hairline-b flex items-center gap-4 ${active ? "bg-graphite-2" : "hover:bg-graphite-2/60"}`}>
+            <li key={p.id} className={`px-5 py-3 hairline-b flex items-center gap-4 ${active ? "bg-white" : "hover:bg-stone/80"}`}>
               <button type="button" className="flex-1 text-left min-w-0" onClick={() => void openAndClose(() => actions.openProject(p.id))}>
-                <div className="text-[12.5px] text-ivory truncate">{p.name}</div>
+                <div className="text-[12.5px] text-ink truncate">{p.name}</div>
                 <div className="t-label mt-0.5">
                   {p.productName} · {formatDate(p.updatedAt)} {formatTime(p.updatedAt)}
                   {p.id === DEMO_PROJECT_ID && " · demo"}
@@ -44,9 +44,9 @@ export function ProjectsSheet() {
             </li>
           );
         })}
-        {projects.length === 0 && <li className="px-5 py-6 text-[11px] text-warm-grey">Todavía no hay proyectos guardados.</li>}
+        {projects.length === 0 && <li className="px-5 py-6 text-[11px] text-muted">Todavía no hay proyectos guardados.</li>}
       </ul>
-      <div className="px-5 py-4 text-[10.5px] text-warm-grey-2">Los proyectos y las fotos se guardan en este navegador.</div>
+      <div className="px-5 py-4 text-[10.5px] text-muted-2">Los proyectos y las fotos se guardan en este navegador.</div>
     </Sheet>
   );
 }

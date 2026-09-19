@@ -59,7 +59,7 @@ export function migrateProject(stored: Partial<Project> & Pick<Project, "id" | "
  * Swapping the demo to a kitchen, facade or pool is a matter of pointing at another pack, photo and footprint.
  */
 export function createDemoProject(): Project {
-  const project = createEmptyProject("Milano X · Rear terrace", clonePack(milanoXPergola));
+  const project = createEmptyProject("Pérgola Milano X · Terraza trasera", clonePack(milanoXPergola));
   const now = Date.now();
   project.id = DEMO_PROJECT_ID;
   project.space = {
@@ -67,7 +67,7 @@ export function createDemoProject(): Project {
       id: "asset_demo_space_pergola",
       kind: "url",
       url: "/demo/pergola/space.jpg",
-      name: "rear-terrace.jpg",
+      name: "terraza-trasera.jpg",
       mime: "image/jpeg",
       width: DEMO_SPACE_SIZE.width,
       height: DEMO_SPACE_SIZE.height,
@@ -89,7 +89,7 @@ export function createDemoProject(): Project {
     b: { x: 0.6138, y: 0.3516 },
     distance: 3.4,
     units: "m",
-    label: "Sliding door width",
+    label: "Ancho de la puerta corredera",
   };
   project.outputs = [
     {
@@ -101,7 +101,7 @@ export function createDemoProject(): Project {
       createdAt: now,
       thumbnail: project.space.asset,
       asset: project.space.asset,
-      provenance: { provider: "local", note: "Source photograph" },
+      provenance: { provider: "local", note: "Fotografía original" },
       settings: {
         productPackId: project.productPack.id,
         productName: project.productPack.name,

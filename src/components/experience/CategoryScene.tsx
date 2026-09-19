@@ -7,10 +7,10 @@ import { Group, MathUtils, MeshStandardMaterial, Vector3 } from "three";
 import { gsap, EASE } from "@/lib/gsap";
 
 export const CATEGORY_GROUPS = [
-  { key: "outdoor", title: "OUTDOOR", items: ["Pergolas", "Pools", "Jacuzzis", "Carports", "Solar"] },
-  { key: "interior", title: "INTERIOR", items: ["Kitchens", "Closets", "Furniture", "Bathrooms"] },
-  { key: "architecture", title: "ARCHITECTURE", items: ["Facades", "Windows", "Doors", "Wall finishes", "Flooring"] },
-  { key: "commercial", title: "COMMERCIAL", items: ["Hotels", "Gyms", "Retail", "Commercial equipment"] },
+  { key: "outdoor", title: "EXTERIOR", items: ["Pérgolas", "Piscinas", "Jacuzzis", "Cocheras", "Placas solares"] },
+  { key: "interior", title: "INTERIOR", items: ["Cocinas", "Armarios", "Mobiliario", "Baños"] },
+  { key: "architecture", title: "ARQUITECTURA", items: ["Fachadas", "Ventanas", "Puertas", "Revestimientos", "Suelos"] },
+  { key: "commercial", title: "COMERCIAL", items: ["Hoteles", "Gimnasios", "Retail", "Equipamiento comercial"] },
 ] as const;
 
 type Mats = { dark: MeshStandardMaterial; ivory: MeshStandardMaterial; stone: MeshStandardMaterial; wood: MeshStandardMaterial; water: MeshStandardMaterial };
@@ -189,18 +189,18 @@ function Groups({ active }: { active: number }) {
 export function CategoryScene({ active }: { active: number }) {
   return (
     <Canvas dpr={[1, 1.5]} camera={{ fov: 30, near: 0.1, far: 60, position: [4, 4.2, 10] }} gl={{ antialias: true }} className="!absolute inset-0">
-      <color attach="background" args={["#131313"]} />
-      <fog attach="fog" args={["#131313", 16, 32]} />
-      <ambientLight intensity={0.75} />
+      <color attach="background" args={["#f1eee8"]} />
+      <fog attach="fog" args={["#f1eee8", 16, 32]} />
+      <ambientLight intensity={0.95} />
       <directionalLight position={[5, 8, 5]} intensity={2} color="#f4ead8" />
-      <directionalLight position={[-6, 3, -4]} intensity={0.9} color="#c9b48c" />
+      <directionalLight position={[-6, 3, -4]} intensity={0.9} color="#8a7452" />
       <Rig active={active} />
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.01, 0]}>
         <circleGeometry args={[14, 48]} />
-        <meshStandardMaterial color="#1f1e1c" roughness={1} />
+        <meshStandardMaterial color="#e4dccd" roughness={1} />
       </mesh>
       <Groups active={active} />
-      <ContactShadows position={[0, 0.001, 0]} opacity={0.5} scale={16} blur={2.4} far={4} color="#000" />
+      <ContactShadows position={[0, 0.001, 0]} opacity={0.28} scale={16} blur={2.6} far={4} color="#3a3128" />
     </Canvas>
   );
 }

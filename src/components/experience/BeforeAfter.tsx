@@ -12,7 +12,7 @@ export function BeforeAfter({
   position,
   onChange,
   focus = { x: 0.5, y: 0.55 },
-  labels = ["BEFORE", "AFTER"],
+  labels = ["ANTES", "DESPUÉS"],
 }: {
   before: string;
   after: string;
@@ -49,15 +49,16 @@ export function BeforeAfter({
       <div className="absolute inset-0" style={{ clipPath: `inset(0 0 0 ${position * 100}%)` }}>
         <CoverImage src={after} width={width} height={height} focus={focus} />
       </div>
-      <div className="absolute top-0 bottom-0 w-px bg-ivory/90 pointer-events-none" style={{ left: `${position * 100}%` }}>
+      <div className="absolute top-0 bottom-0 w-[2px] bg-white shadow-[0_0_0_1px_rgba(0,0,0,0.06)] pointer-events-none" style={{ left: `${position * 100}%` }}>
         {onChange && (
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 border border-ivory/90 bg-graphite-0/70 flex items-center justify-center">
-            <span className="block w-3 h-px bg-ivory" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white shadow-md flex items-center justify-center gap-0.5">
+            <span className="block w-1 h-3 rounded-full bg-ink-2/70" />
+            <span className="block w-1 h-3 rounded-full bg-ink-2/70" />
           </div>
         )}
       </div>
-      <span className="absolute top-4 left-4 t-label-strong bg-graphite-0/60 px-2 py-1 pointer-events-none">{labels[0]}</span>
-      <span className="absolute top-4 right-4 t-label-strong bg-graphite-0/60 px-2 py-1 pointer-events-none" style={{ opacity: position < 0.98 ? 1 : 0.5 }}>
+      <span className="absolute top-4 left-4 t-label-strong bg-white/95 rounded-full px-3 py-1.5 shadow-sm pointer-events-none">{labels[0]}</span>
+      <span className="absolute top-4 right-4 t-label-strong bg-white/95 rounded-full px-3 py-1.5 shadow-sm pointer-events-none" style={{ opacity: position < 0.98 ? 1 : 0.5 }}>
         {labels[1]}
       </span>
     </div>

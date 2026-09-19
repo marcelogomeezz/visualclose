@@ -5,13 +5,14 @@ import { CATEGORY_LABELS, PLACEMENT_TYPES, PLACEMENT_TYPE_LABELS, type Placement
 import { formatDimensions } from "@/core/geometry/units";
 import { actions, useProject } from "@/state/project-store";
 import { usePlacementSolve, useDisplayedOutput } from "@/state/derived";
-import { ui, useUI } from "@/state/ui-store";
+import { ui, useUI, MODE_LABELS } from "@/state/ui-store";
 import { Button } from "@/components/ui/Button";
 import { Row, Section } from "@/components/ui/Section";
 import { formatTime, outputLabel } from "@/lib/format";
 import { Sheet } from "./Sheet";
 
 const UNITS: Units[] = ["m", "cm", "mm", "ft", "in"];
+const PROVIDER_LABELS: Record<string, string> = { mock: "Simulado", openai: "OpenAI", higgsfield: "Higgsfield", local: "Local" };
 
 /** Everything an operator does not need day to day: product data, analysis internals, output provenance, developer state. */
 export function AdvancedSheet() {
@@ -46,7 +47,7 @@ export function AdvancedSheet() {
   const list = (items: string[]) => (
     <ul className="space-y-0.5">
       {items.map((i) => (
-        <li key={i} className="text-[11px] text-ivory/85 leading-snug pl-2.5 relative before:content-[''] before:absolute before:left-0 before:top-[7px] before:w-1 before:h-px before:bg-warm-grey">
+        <li key={i} className="text-[11px] text-ink/85 leading-snug pl-2.5 relative before:content-[''] before:absolute before:left-0 before:top-[7px] before:w-1 before:h-px before:bg-muted">
           {i}
         </li>
       ))}
@@ -97,10 +98,10 @@ export function AdvancedSheet() {
         </div>
       </Section>
 
-      <Section title="Análisis del producto" aside={dna && <span className="t-label text-champagne">listo</span>}>
+      <Section title="Análisis del producto" aside={dna && <span className="t-label text-accent">listo</span>}>
         {dna ? (
           <div className="space-y-3">
-            <p className="text-[11.5px] text-ivory/90 leading-snug">{dna.summary}</p>
+            <p className="text-[11.5px] text-ink/85 leading-snug">{dna.summary}</p>
             <div>
               <div className="t-label mb-1">No debe cambiar</div>
               {list(dna.invariants)}
@@ -113,17 +114,17 @@ export function AdvancedSheet() {
               <div className="t-label mb-1">Restricciones de render</div>
               {list(dna.renderingConstraints)}
             </div>
-            <div className="text-[10.5px] text-warm-grey-2">Comprensión estructurada de las referencias. No se entrena ningún modelo.</div>
+            <div className="text-[10.5px] text-muted-2">Comprensión estructurada de las referencias. No se entrena ningún modelo.</div>
             <Button size="sm" variant="quiet" onClick={() => actions.setProductDNA(null)}>
               Volver a analizar
             </Button>
           </div>
         ) : (
-          <div className="text-[11px] text-warm-grey">Se ejecuta automáticamente al añadir fotos del producto.</div>
+          <div className="text-[11px] text-muted">Se ejecuta automáticamente al añadir fotos del producto.</div>
         )}
       </Section>
 
-      <Section title="Análisis del espacio" aside={lock && <span className="t-label text-champagne">listo</span>}>
+      <Section title="Análisis del espacio" aside={lock && <span className="t-label text-accent">listo</span>}>
         {lock ? (
           <div className="space-y-3">
             <div>
@@ -138,12 +139,12 @@ export function AdvancedSheet() {
             </Button>
           </div>
         ) : (
-          <div className="text-[11px] text-warm-grey">Se ejecuta automáticamente al añadir la foto del espacio.</div>
+          <div className="text-[11px] text-muted">Se ejecuta automáticamente al añadir la foto del espacio.</div>
         )}
       </Section>
 
-      <Section title="Región de edición" aside={project.placementAssetsRevision === project.revision ? <span className="t-label text-champagne">al día</span> : <span className="t-label">pendiente</span>}>
-        <div className="text-[11px] text-warm-grey mb-3 leading-snug">
+      <Section title="Región de edición" aside={project.placementAssetsRevision === project.revision ? <span className="t-label text-accent">al día</span> : <span className="t-label">pendiente</span>}>
+        <div className="text-[11px] text-muted mb-3 leading-snug">
           La foto original es la fuente de verdad. La IA solo puede cambiar la máscara; la referencia de colocación guía la perspectiva. Ninguna de las dos es una salida.
         </div>
         <div className="grid grid-cols-2 gap-2 mb-3">
@@ -153,12 +154,12 @@ export function AdvancedSheet() {
           ].map(([label, asset]) => (
             <div key={label as string}>
               <div className="t-label mb-1">{label as string}</div>
-              <div className="aspect-[3/2] bg-graphite-0 border border-line overflow-hidden">
+              <div className="aspect-[3/2] rounded-xl bg-stone border border-line overflow-hidden">
                 {asset && typeof asset === "object" && asset.url ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={asset.url} alt="" className="w-full h-full object-cover" />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-[10px] text-warm-grey-2">Se genera al pulsar LISTO</div>
+                  <div className="w-full h-full flex items-center justify-center text-[10px] text-muted-2">Se genera al pulsar LISTO</div>
                 )}
               </div>
             </div>
@@ -181,11 +182,11 @@ export function AdvancedSheet() {
 
       {displayed && (
         <Section title={outputLabel(displayed.type, displayed.index)} aside={<span className="t-label">{formatTime(displayed.createdAt)}</span>}>
-          <Row label="Proveedor">{displayed.provenance.provider}</Row>
+          <Row label="Proveedor">{PROVIDER_LABELS[displayed.provenance.provider] ?? displayed.provenance.provider}</Row>
           <Row label="Revisión">
             <span className="t-mono">
               {displayed.sourceRevision}
-              {displayed.sourceRevision !== project.revision && <span className="text-champagne"> · anterior</span>}
+              {displayed.sourceRevision !== project.revision && <span className="text-accent"> · anterior</span>}
             </span>
           </Row>
           <Row label="Medidas">
@@ -194,13 +195,13 @@ export function AdvancedSheet() {
           <Row label="Alineado con la foto">{displayed.registered ? "Sí" : "No"}</Row>
           {displayed.preservation && (
             <Row label="Fondo conservado">
-              <span className={`t-mono ${displayed.preservation.passed ? "text-champagne" : "text-danger"}`}>
+              <span className={`t-mono ${displayed.preservation.passed ? "text-accent" : "text-danger"}`}>
                 {(100 - displayed.preservation.outsideChangedRatio * 100).toFixed(2)}% · {displayed.preservation.passed ? "ok" : "revisar"}
               </span>
             </Row>
           )}
-          {displayed.preservation && <div className="text-[10.5px] text-warm-grey-2 pt-1">Estimación interna fuera de la máscara. No es una garantía píxel a píxel.</div>}
-          {displayed.provenance.note && <div className="text-[10.5px] text-warm-grey pt-1">{displayed.provenance.note}</div>}
+          {displayed.preservation && <div className="text-[10.5px] text-muted-2 pt-1">Estimación interna fuera de la máscara. No es una garantía píxel a píxel.</div>}
+          {displayed.provenance.note && <div className="text-[10.5px] text-muted pt-1">{displayed.provenance.note}</div>}
           <div className="flex gap-2 mt-3">
             <Button size="sm" variant="outline" onClick={() => actions.toggleFavorite(displayed.id)}>
               {displayed.favorite ? "Quitar favorito" : "Favorito"}
@@ -225,7 +226,7 @@ export function AdvancedSheet() {
       )}
 
       <Section title="Geometría">
-        <Row label="Modo">{mode}</Row>
+        <Row label="Modo">{MODE_LABELS[mode]}</Row>
         <Row label="Revisión del proyecto">
           <span className="t-mono">{project.revision}</span>
         </Row>
@@ -245,8 +246,8 @@ export function AdvancedSheet() {
       </Section>
 
       <Section title="Desarrollo">
-        <Row label="Proveedor IA">mock (servidor)</Row>
-        <Row label="Proveedor de generación">mock (servidor)</Row>
+        <Row label="Proveedor IA">Simulado (servidor)</Row>
+        <Row label="Proveedor de generación">Simulado (servidor)</Row>
         <Row label="Frames por segundo">
           <span className="t-mono">{fps}</span>
         </Row>
@@ -258,7 +259,7 @@ export function AdvancedSheet() {
             Borrar datos locales
           </Button>
         </div>
-        {showState && <pre className="mt-3 t-mono text-[10px] text-warm-grey whitespace-pre-wrap break-all leading-relaxed">{JSON.stringify({ ...project, outputs: project.outputs.map((o) => ({ ...o, asset: { ...o.asset, url: "…" }, thumbnail: { ...o.thumbnail, url: "…" } })) }, null, 2)}</pre>}
+        {showState && <pre className="mt-3 t-mono text-[10px] text-muted whitespace-pre-wrap break-all leading-relaxed">{JSON.stringify({ ...project, outputs: project.outputs.map((o) => ({ ...o, asset: { ...o.asset, url: "…" }, thumbnail: { ...o.thumbnail, url: "…" } })) }, null, 2)}</pre>}
       </Section>
     </Sheet>
   );

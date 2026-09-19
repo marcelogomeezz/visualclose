@@ -30,7 +30,8 @@ export function TopBar() {
   const item = (label: string, onClick: () => void) => (
     <button
       type="button"
-      className="w-full text-left px-4 py-2.5 text-[11px] tracking-[0.12em] uppercase text-warm-grey hover:text-ivory hover:bg-graphite-3 transition-colors"
+      className="w-full text-left mx-1.5 my-0.5 rounded-lg px-3 py-2 text-[12px] text-ink-2 hover:text-ink hover:bg-stone transition-colors"
+      style={{ width: "calc(100% - 12px)" }}
       onClick={() => {
         setMenu(false);
         onClick();
@@ -41,15 +42,15 @@ export function TopBar() {
   );
 
   return (
-    <header className="h-full grid grid-cols-[1fr_auto_1fr] items-center hairline-b bg-graphite-1 px-4">
-      <Link href="/" className="text-[11px] tracking-[0.3em] font-medium text-ivory select-none hover:text-offwhite w-max">
+    <header className="h-full grid grid-cols-[1fr_auto_1fr] items-center hairline-b bg-paper px-4">
+      <Link href="/" className="text-[11px] tracking-[0.3em] font-medium text-ink select-none hover:text-ink w-max">
         VISUALCLOSE
       </Link>
       <div className="flex justify-center min-w-0">
         {editing ? (
           <input
             autoFocus
-            className="bg-transparent text-center text-[12px] text-ivory outline-none border-b border-line-strong w-[260px] py-0.5"
+            className="bg-transparent text-center text-[12px] text-ink outline-none border-b border-line-strong w-[260px] py-0.5"
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
             onBlur={commit}
@@ -65,7 +66,7 @@ export function TopBar() {
               setDraft(project?.name ?? "");
               setEditing(true);
             }}
-            className="text-[12px] text-ivory/80 hover:text-ivory truncate py-0.5"
+            className="text-[12px] text-ink/85 hover:text-ink truncate py-0.5"
             title="Renombrar proyecto"
           >
             {project?.name ?? "—"}
@@ -76,7 +77,7 @@ export function TopBar() {
         <button
           type="button"
           onClick={() => ui.enterPresent()}
-          className="h-8 px-3.5 text-[10.5px] tracking-[0.18em] uppercase font-medium text-graphite-0 bg-ivory hover:bg-offwhite transition-colors"
+          className="h-9 px-4 rounded-full text-[12px] font-medium text-white bg-ink hover:bg-ink-2 transition-colors"
         >
           Presentar
         </button>
@@ -84,12 +85,12 @@ export function TopBar() {
           type="button"
           aria-label="Más"
           onClick={() => setMenu((m) => !m)}
-          className="h-8 w-8 flex items-center justify-center text-warm-grey hover:text-ivory text-[16px] leading-none"
+          className="h-9 w-9 rounded-full flex items-center justify-center text-muted hover:text-ink hover:bg-stone text-[16px] leading-none transition-colors"
         >
           ···
         </button>
         {menu && (
-          <div className="absolute right-0 top-10 w-52 bg-graphite-2 border border-line py-1 z-40 vc-fade-in">
+          <div className="absolute right-0 top-11 w-52 rounded-2xl bg-white border border-line py-1.5 lift z-40 vc-fade-in">
             {item("Proyectos", () => ui.openSheet("projects"))}
             {item("Nuevo proyecto", () => {
               actions.newProject("Proyecto sin título");

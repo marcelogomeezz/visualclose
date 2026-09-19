@@ -4,16 +4,17 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { gsap, ScrollTrigger, EASE } from "@/lib/gsap";
 import { CoverImage } from "@/components/present/CoverImage";
 import { DEMO_PERGOLA_FOOTPRINT, DEMO_PERGOLA_FOV_DEG, DEMO_SPACE_SIZE } from "@/core/demo/pergola-placement.generated";
-import { HeroScene } from "./HeroScene";
 import { CategoryScene, CATEGORY_GROUPS } from "./CategoryScene";
 import { BeforeAfter } from "./BeforeAfter";
 import { RealPlanOverlay } from "./RealPlanOverlay";
 import { useCurtainNavigate } from "./TransitionCurtain";
 import { useDemoReality } from "./useDemoReality";
 
-// PLACEHOLDER demo photograph (synthetic). REALIDAD below is composed over it in the browser, never pre-rendered.
+// Imágenes de demostración (ilustrativas). REALIDAD se compone en el navegador sobre la foto original,
+// nunca se pre-renderiza: ver src/lib/reality-composite.ts.
 const SPACE = "/demo/pergola/space.jpg";
 const ARCHVIZ = "/demo/pergola/archviz.jpg";
+const REF_FRONT = "/demo/pergola/ref-front.jpg";
 const DIMS = { width: 5, depth: 4, height: 2.7, units: "m" as const };
 const FOCUS = { x: 0.47, y: 0.6 };
 
@@ -56,51 +57,170 @@ function Reveal({ children, className = "", delay = 0 }: { children: React.React
   );
 }
 
+// ---------------------------------------------------------------- small inline icons
+
+function IconSpark(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5L18 18M18 6l-2.5 2.5M8.5 15.5L6 18" />
+    </svg>
+  );
+}
+function IconClock(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <circle cx="12" cy="12" r="8.25" />
+      <path d="M12 7.5V12l3 2" />
+    </svg>
+  );
+}
+function IconShield(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <path d="M12 3.5l7 2.6v5.4c0 4.4-3 7.9-7 9-4-1.1-7-4.6-7-9V6.1z" />
+      <path d="M9 12l2.1 2.1L15.5 9.5" />
+    </svg>
+  );
+}
+function IconUpload(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <path d="M12 15.5V4M8 8l4-4 4 4" />
+      <path d="M4.5 15.5v3a2 2 0 002 2h11a2 2 0 002-2v-3" />
+    </svg>
+  );
+}
+function IconPlus(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" {...props}>
+      <path d="M12 5v14M5 12h14" />
+    </svg>
+  );
+}
+function IconEye(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z" />
+      <circle cx="12" cy="12" r="2.6" />
+    </svg>
+  );
+}
+function IconMove(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <path d="M12 3v18M3 12h18M6 6L3 3M3 3l3 0M3 3l0 3M18 6l3-3M21 3l-3 0M21 3l0 3M6 18l-3 3M3 21l3 0M3 21l0-3M18 18l3 3M21 21l-3 0M21 21l0-3" />
+    </svg>
+  );
+}
+function IconPlay(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" {...props}>
+      <path d="M8 5.5v13l11-6.5z" />
+    </svg>
+  );
+}
+
 // ---------------------------------------------------------------- HERO
 
 export function Hero() {
   const go = useCurtainNavigate();
   const copy = useRef<HTMLDivElement>(null);
+  const photoRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (!copy.current) return;
     const items = copy.current.querySelectorAll("[data-line]");
-    gsap.fromTo(items, { autoAlpha: 0, y: 22 }, { autoAlpha: 1, y: 0, duration: 1.1, stagger: 0.14, delay: 0.5, ease: EASE.out });
+    gsap.fromTo(items, { autoAlpha: 0, y: 22 }, { autoAlpha: 1, y: 0, duration: 1.1, stagger: 0.12, delay: 0.35, ease: EASE.out });
+    if (photoRef.current) {
+      gsap.fromTo(photoRef.current, { scale: 1.06, autoAlpha: 0 }, { scale: 1, autoAlpha: 1, duration: 1.4, ease: EASE.slow });
+    }
   }, []);
+  // Parallax muy suave: la foto se desplaza ligeramente más lento que el scroll.
+  useEffect(() => {
+    const onScroll = () => {
+      if (!photoRef.current) return;
+      const y = Math.min(140, window.scrollY * 0.18);
+      photoRef.current.style.transform = `translate3d(0, ${y}px, 0) scale(1.06)`;
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const benefits: { icon: (p: React.SVGProps<SVGSVGElement>) => React.ReactElement; label: string }[] = [
+    { icon: IconSpark, label: "Sin instalaciones" },
+    { icon: IconClock, label: "Resultados en segundos" },
+    { icon: IconShield, label: "Para profesionales y particulares" },
+  ];
+
   return (
-    <section id="top" className="relative h-[100svh] min-h-[560px] overflow-hidden bg-graphite-0">
-      <HeroScene />
-      <div className="absolute inset-0 bg-gradient-to-t from-graphite-0/90 via-graphite-0/20 to-transparent pointer-events-none" />
-      <div ref={copy} className="absolute inset-x-0 bottom-0 px-5 md:px-8 pb-10 md:pb-14 grid md:grid-cols-[1fr_auto] items-end gap-8">
-        <div>
-          <h1 data-line className="t-editorial text-ivory" style={{ fontSize: "clamp(44px, 9vw, 128px)" }}>
-            SEE IT.
+    <section id="top" className="relative min-h-[92svh] overflow-hidden bg-stone pt-16">
+      <div className="absolute inset-0 overflow-hidden">
+        <div ref={photoRef} className="absolute inset-0" style={{ willChange: "transform" }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={ARCHVIZ} alt="Terraza real con la pérgola Milano X instalada" className="absolute inset-0 w-full h-full object-cover" style={{ filter: "brightness(1.08) saturate(1.1) contrast(0.98)" }} />
+        </div>
+        <div className="absolute inset-0 bg-gradient-to-t from-ink/60 via-ink/10 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-paper/90 via-paper/10 to-transparent md:from-paper/70" />
+      </div>
+
+      <div className="relative z-10 px-5 md:px-10 pt-10 md:pt-16">
+        <div ref={copy} className="max-w-[640px]">
+          <div data-line className="t-label text-accent mb-4">
+            Espacios reales. Decisiones seguras.
+          </div>
+          <h1 data-line className="t-display text-ink" style={{ fontSize: "clamp(40px, 7vw, 80px)" }}>
+            Míralo antes
             <br />
-            BEFORE IT EXISTS.
+            de instalarlo.
           </h1>
-          <p data-line className="mt-5 text-[14px] md:text-[16px] text-warm-grey leading-snug max-w-[420px]">
-            Real products. Real spaces.
-            <br />
-            Visualized before installation.
+          <p data-line className="mt-6 text-[15px] md:text-[17px] text-ink-2 leading-relaxed max-w-[460px]">
+            Sube una foto de tu espacio, añade tu producto, coloca las medidas y visualiza el resultado antes de tomar la decisión.
           </p>
-          <div data-line className="mt-7 flex flex-wrap items-center gap-3">
-            <button type="button" onClick={() => go("/studio")} className="h-11 px-6 text-[11px] tracking-[0.2em] uppercase font-medium text-graphite-0 bg-ivory hover:bg-offwhite transition-colors">
-              Try VisualClose
+          <div data-line className="mt-8 flex flex-wrap items-center gap-5">
+            <button type="button" onClick={() => go("/studio")} className="h-12 px-7 rounded-full text-[13px] font-medium text-white bg-ink hover:bg-ink-2 transition-colors inline-flex items-center gap-2">
+              Probar VisualClose <span aria-hidden>→</span>
             </button>
-            <a href="#story" className="h-11 px-6 inline-flex items-center text-[11px] tracking-[0.2em] uppercase font-medium text-ivory border border-line-strong hover:bg-graphite-3 transition-colors">
-              See how it works
+            <a href="#como-funciona" className="inline-flex items-center gap-2.5 text-[13px] font-medium text-ink-2 hover:text-ink transition-colors">
+              <span className="w-9 h-9 rounded-full bg-white/90 shadow-sm flex items-center justify-center">
+                <IconPlay className="w-3.5 h-3.5 text-ink ml-0.5" />
+              </span>
+              Ver cómo funciona
             </a>
           </div>
+          <div data-line className="mt-10 flex flex-wrap items-center gap-x-7 gap-y-3">
+            {benefits.map(({ icon: Icon, label }) => (
+              <span key={label} className="inline-flex items-center gap-2 text-[12.5px] text-ink-2">
+                <Icon className="w-4 h-4 text-accent shrink-0" />
+                {label}
+              </span>
+            ))}
+          </div>
         </div>
-        <div data-line className="hidden md:block t-label text-right">
-          Scroll
-          <div className="w-px h-10 bg-line-strong ml-auto mt-2" />
+      </div>
+
+      <div data-line className="absolute right-5 md:right-10 bottom-8 md:bottom-12 z-10">
+        <div className="w-[240px] md:w-[260px] card rounded-2xl p-3.5 lift">
+          <div className="text-[10px] text-muted mb-2 -mt-0.5">Tu producto en tu espacio real</div>
+          <div className="rounded-xl overflow-hidden aspect-[4/3] bg-stone relative">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={REF_FRONT} alt="Pérgola Milano X" className="absolute inset-0 w-full h-full object-cover" />
+          </div>
+          <div className="mt-3 flex items-center justify-between">
+            <div>
+              <div className="text-[13px] font-medium text-ink">Pérgola Milano X</div>
+              <div className="text-[11px] text-muted t-mono">500 × 400 × 270 cm</div>
+            </div>
+            <span className="w-8 h-8 rounded-full bg-stone flex items-center justify-center shrink-0">
+              <IconMove className="w-4 h-4 text-ink-2" />
+            </span>
+          </div>
         </div>
       </div>
     </section>
   );
 }
 
-// ---------------------------------------------------------------- STORY 1: BEFORE / AFTER
+// ---------------------------------------------------------------- STORY 1: ANTES / DESPUÉS
 
 export function StorySection() {
   const ref = useRef<HTMLElement>(null);
@@ -110,21 +230,21 @@ export function StorySection() {
   const reveal = Math.min(1, Math.max(0, (progress - 0.15) / 0.55));
   const position = manual !== null && progress > 0.7 ? manual : 1 - reveal;
   return (
-    <section id="story" ref={ref} className="relative h-[240vh] bg-graphite-0">
+    <section id="antes-despues" ref={ref} className="relative h-[220vh] bg-stone">
       <div className="sticky top-0 h-[100svh] overflow-hidden">
         <BeforeAfter before={SPACE} after={reality ?? SPACE} width={DEMO_SPACE_SIZE.width} height={DEMO_SPACE_SIZE.height} position={position} focus={FOCUS} onChange={progress > 0.7 ? setManual : undefined} />
-        <div className="absolute inset-0 bg-gradient-to-t from-graphite-0/85 via-transparent to-graphite-0/30 pointer-events-none" />
-        <div className="absolute left-5 md:left-8 bottom-10 md:bottom-14 pointer-events-none">
-          <div className="t-label mb-3" style={{ opacity: Math.min(1, progress * 4) }}>
-            The real space · the real product
+        <div className="absolute inset-0 bg-gradient-to-t from-ink/55 via-transparent to-transparent pointer-events-none" />
+        <div className="absolute left-5 md:left-10 bottom-10 md:bottom-14 pointer-events-none">
+          <div className="t-label text-white/80 mb-3" style={{ opacity: Math.min(1, progress * 4) }}>
+            Tu espacio · tu producto
           </div>
-          <h2 className="t-editorial text-ivory" style={{ fontSize: "clamp(36px, 6.5vw, 96px)", opacity: Math.min(1, progress * 3) }}>
-            DON&apos;T IMAGINE IT.
+          <h2 className="t-display text-white" style={{ fontSize: "clamp(32px, 5.5vw, 76px)", opacity: Math.min(1, progress * 3) }}>
+            No lo imagines.
             <br />
-            <span style={{ opacity: reveal }}>SEE IT.</span>
+            <span style={{ opacity: reveal }}>Míralo.</span>
           </h2>
-          <div className="mt-4 t-label" style={{ opacity: progress > 0.7 ? 1 : 0 }}>
-            Drag to compare · same photograph, only the product changes
+          <div className="mt-4 t-label text-white/75" style={{ opacity: progress > 0.7 ? 1 : 0 }}>
+            Arrastra para comparar · la misma foto, solo cambia el producto
           </div>
         </div>
       </div>
@@ -132,7 +252,7 @@ export function StorySection() {
   );
 }
 
-// ---------------------------------------------------------------- STORY 2: CATEGORIES
+// ---------------------------------------------------------------- STORY 2: APLICACIONES
 
 export function CategoriesSection() {
   const ref = useRef<HTMLElement>(null);
@@ -140,21 +260,21 @@ export function CategoriesSection() {
   const active = Math.min(CATEGORY_GROUPS.length - 1, Math.floor(progress * CATEGORY_GROUPS.length));
   const group = CATEGORY_GROUPS[active];
   return (
-    <section id="use-cases" ref={ref} className="relative bg-graphite-1" style={{ height: `${CATEGORY_GROUPS.length * 100 + 40}vh` }}>
+    <section id="aplicaciones" ref={ref} className="relative bg-paper" style={{ height: `${CATEGORY_GROUPS.length * 100 + 40}vh` }}>
       <div className="sticky top-0 h-[100svh] overflow-hidden grid grid-rows-[1fr_auto] md:grid-rows-1 md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
-        <div className="order-2 md:order-1 relative z-10 px-5 md:px-8 pb-10 md:pb-0 flex flex-col justify-end md:justify-center">
-          <div className="t-label mb-4">Not only pergolas</div>
-          <h2 className="t-editorial text-ivory" style={{ fontSize: "clamp(34px, 5vw, 72px)" }}>
-            ONE TOOL.
+        <div className="order-2 md:order-1 relative z-10 px-5 md:px-10 pb-10 md:pb-0 flex flex-col justify-end md:justify-center">
+          <div className="t-label mb-4">No solo pérgolas</div>
+          <h2 className="t-display text-ink" style={{ fontSize: "clamp(30px, 4.4vw, 60px)" }}>
+            Una herramienta.
             <br />
-            EVERY PHYSICAL PRODUCT.
+            Cualquier producto físico.
           </h2>
           <div className="mt-8 md:mt-12 min-h-[150px]">
             <div key={group.key} className="vc-fade-in">
-              <div className="text-[12px] tracking-[0.24em] text-champagne mb-3">{group.title}</div>
+              <div className="text-[12px] tracking-[0.24em] text-accent mb-3">{group.title}</div>
               <ul className="flex flex-wrap gap-x-5 gap-y-1.5 md:block md:space-y-1.5">
                 {group.items.map((item, i) => (
-                  <li key={item} className="text-[18px] md:text-[26px] text-ivory/90 leading-tight" style={{ animation: `vc-fade-in 500ms ${i * 70}ms ease both` }}>
+                  <li key={item} className="text-[18px] md:text-[26px] text-ink-2 leading-tight" style={{ animation: `vc-fade-in 500ms ${i * 70}ms ease both` }}>
                     {item}
                   </li>
                 ))}
@@ -163,27 +283,27 @@ export function CategoriesSection() {
           </div>
           <div className="mt-8 flex gap-1.5">
             {CATEGORY_GROUPS.map((g, i) => (
-              <span key={g.key} className={`h-px transition-all duration-500 ${i === active ? "w-10 bg-ivory" : "w-4 bg-line-strong"}`} />
+              <span key={g.key} className={`h-1 rounded-full transition-all duration-500 ${i === active ? "w-10 bg-ink" : "w-4 bg-line-strong"}`} />
             ))}
           </div>
         </div>
-        <div className="order-1 md:order-2 relative min-h-[42svh]">
+        <div className="order-1 md:order-2 relative min-h-[42svh] bg-stone">
           <CategoryScene active={active} />
-          <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-graphite-1 via-transparent to-transparent pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-paper via-transparent to-transparent pointer-events-none" />
         </div>
       </div>
     </section>
   );
 }
 
-// ---------------------------------------------------------------- REAL PLAN
+// ---------------------------------------------------------------- PLANO REAL
 
 export function RealPlanSection() {
   const ref = useRef<HTMLElement>(null);
   const progress = useScrollProgress(ref);
   const draw = Math.min(1, Math.max(0, (progress - 0.1) / 0.6));
   return (
-    <section id="real-plan" ref={ref} className="relative h-[220vh] bg-graphite-0">
+    <section id="plano-real" ref={ref} className="relative h-[200vh] bg-stone">
       <div className="sticky top-0 h-[100svh] overflow-hidden">
         <CoverImage
           src={SPACE}
@@ -191,28 +311,28 @@ export function RealPlanSection() {
           height={DEMO_SPACE_SIZE.height}
           focus={FOCUS}
           overlay={(t) => (
-            <RealPlanOverlay footprint={DEMO_PERGOLA_FOOTPRINT} dimensions={DIMS} fovDeg={DEMO_PERGOLA_FOV_DEG} width={DEMO_SPACE_SIZE.width} height={DEMO_SPACE_SIZE.height} t={t} progress={draw} productName="Milano X Pergola" />
+            <RealPlanOverlay footprint={DEMO_PERGOLA_FOOTPRINT} dimensions={DIMS} fovDeg={DEMO_PERGOLA_FOV_DEG} width={DEMO_SPACE_SIZE.width} height={DEMO_SPACE_SIZE.height} t={t} progress={draw} productName="Pérgola Milano X" />
           )}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-graphite-0/90 via-graphite-0/10 to-graphite-0/40 pointer-events-none" />
-        <div className="absolute top-20 md:top-24 left-5 md:left-8 pointer-events-none">
-          <div className="t-label mb-3">Real plan</div>
-          <h2 className="t-editorial text-ivory" style={{ fontSize: "clamp(30px, 4.6vw, 68px)" }}>
-            THE PLAN IS
+        <div className="absolute inset-0 bg-gradient-to-t from-ink/50 via-ink/5 to-transparent pointer-events-none" />
+        <div className="absolute top-24 md:top-28 left-5 md:left-10 pointer-events-none">
+          <div className="t-label text-white/80 mb-3">Plano real</div>
+          <h2 className="t-display text-white" style={{ fontSize: "clamp(28px, 4.2vw, 60px)" }}>
+            El plano es
             <br />
-            THE REAL SPACE.
+            el espacio real.
           </h2>
         </div>
-        <div className="absolute right-5 md:right-8 bottom-10 md:bottom-14 pointer-events-none max-w-[380px] text-right">
-          <p className="text-[16px] md:text-[20px] text-ivory leading-snug" style={{ opacity: Math.min(1, Math.max(0, (progress - 0.45) / 0.3)) }}>
-            Real image.
+        <div className="absolute right-5 md:right-10 bottom-10 md:bottom-14 pointer-events-none max-w-[380px] text-right">
+          <p className="text-[16px] md:text-[20px] text-white leading-snug" style={{ opacity: Math.min(1, Math.max(0, (progress - 0.45) / 0.3)) }}>
+            Imagen real.
             <br />
-            Real dimensions.
+            Medidas reales.
             <br />
-            Real placement.
+            Colocación real.
           </p>
-          <p className="mt-4 text-[12px] text-warm-grey leading-snug" style={{ opacity: Math.min(1, Math.max(0, (progress - 0.6) / 0.3)) }}>
-            Not a CAD drawing. The photograph is the plan: placement, width, depth, height, footprint and anchor points, over the space as it really is.
+          <p className="mt-4 text-[12px] text-white/75 leading-snug" style={{ opacity: Math.min(1, Math.max(0, (progress - 0.6) / 0.3)) }}>
+            No es un plano CAD. La fotografía es el plano: colocación, ancho, fondo, alto, contorno y puntos de referencia, sobre el espacio tal como es.
           </p>
         </div>
       </div>
@@ -220,46 +340,57 @@ export function RealPlanSection() {
   );
 }
 
-// ---------------------------------------------------------------- HOW IT WORKS
+// ---------------------------------------------------------------- CÓMO FUNCIONA
 
 export function HowItWorks() {
-  const steps = [
-    { n: "01", title: "ADD YOUR SPACE", copy: "Upload the real environment." },
-    { n: "02", title: "ADD YOUR PRODUCT", copy: "Upload product references. Add dimensions if available." },
-    { n: "03", title: "VISUALIZE", copy: "See it inside the real space." },
+  const steps: { n: string; title: string; copy: string; image: string; icon: (p: React.SVGProps<SVGSVGElement>) => React.ReactElement }[] = [
+    { n: "1", title: "Tu espacio", copy: "Sube una foto de tu habitación o espacio real.", image: SPACE, icon: IconUpload },
+    { n: "2", title: "Tu producto", copy: "Añade una imagen del producto que quieres visualizar.", image: REF_FRONT, icon: IconPlus },
+    { n: "3", title: "Visualiza", copy: "Coloca, ajusta y comprueba cómo queda en tu espacio.", image: ARCHVIZ, icon: IconEye },
   ];
   return (
-    <section id="how" className="bg-graphite-1 px-5 md:px-8 py-24 md:py-40">
-      <Reveal>
-        <div className="t-label mb-4">How it works</div>
-        <h2 className="t-editorial text-ivory mb-16 md:mb-24" style={{ fontSize: "clamp(32px, 4.5vw, 64px)" }}>
-          THREE STEPS. THAT&apos;S IT.
+    <section id="como-funciona" className="bg-paper px-5 md:px-10 py-24 md:py-32">
+      <Reveal className="max-w-[720px] mb-14 md:mb-20">
+        <div className="t-label mb-4">Cómo funciona</div>
+        <h2 className="t-display text-ink" style={{ fontSize: "clamp(30px, 4.2vw, 56px)" }}>
+          Tres pasos. Así de simple.
         </h2>
       </Reveal>
-      <div className="grid md:grid-cols-3 gap-10 md:gap-8">
-        {steps.map((s, i) => (
-          <Reveal key={s.n} delay={i * 0.12} className="hairline-t pt-6">
-            <div className="t-mono text-[13px] text-champagne mb-6">{s.n}</div>
-            <div className="text-[20px] md:text-[24px] tracking-[0.04em] text-ivory font-medium">{s.title}</div>
-            <p className="mt-3 text-[14px] text-warm-grey leading-snug max-w-[300px]">{s.copy}</p>
-          </Reveal>
-        ))}
-      </div>
+      <Reveal delay={0.1}>
+        <div className="card rounded-3xl overflow-hidden divide-y md:divide-y-0 md:divide-x divide-line grid md:grid-cols-3">
+          {steps.map((s) => (
+            <div key={s.n} className="p-7 md:p-9 flex items-center gap-5">
+              <div className="min-w-0 flex-1">
+                <div className="w-8 h-8 rounded-full bg-sand-soft border border-line flex items-center justify-center text-[13px] font-semibold text-ink mb-4">{s.n}</div>
+                <div className="text-[17px] font-semibold text-ink">{s.title}</div>
+                <p className="mt-1.5 text-[13.5px] text-muted leading-snug">{s.copy}</p>
+              </div>
+              <div className="relative w-20 h-20 md:w-24 md:h-24 shrink-0 rounded-2xl overflow-hidden bg-stone">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={s.image} alt="" className="absolute inset-0 w-full h-full object-cover" />
+                <span className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full bg-ink text-white flex items-center justify-center shadow-md">
+                  <s.icon className="w-3.5 h-3.5" />
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </Reveal>
     </section>
   );
 }
 
-// ---------------------------------------------------------------- OUTPUTS
+// ---------------------------------------------------------------- RESULTADOS
 
 function OutputCard({ kicker, title, copy, children, primary = false }: { kicker: string; title: string; copy: string; children: React.ReactNode; primary?: boolean }) {
   return (
-    <div className={`snap-start shrink-0 w-[82vw] md:w-[46vw] lg:w-[38vw] ${primary ? "" : ""}`}>
-      <div className="relative aspect-[3/2] bg-graphite-0 border border-line overflow-hidden">{children}</div>
+    <div className="snap-start shrink-0 w-[82vw] md:w-[44vw] lg:w-[36vw]">
+      <div className={`relative aspect-[3/2] rounded-2xl overflow-hidden bg-stone ${primary ? "lift" : "card"}`}>{children}</div>
       <div className="mt-4 flex items-baseline gap-3">
-        <span className={`text-[12px] tracking-[0.22em] ${primary ? "text-champagne" : "text-warm-grey"}`}>{kicker}</span>
-        <span className="text-[18px] md:text-[20px] text-ivory tracking-[0.02em]">{title}</span>
+        <span className={`text-[12px] tracking-[0.18em] ${primary ? "text-accent" : "text-muted"}`}>{kicker}</span>
+        <span className="text-[17px] md:text-[19px] text-ink font-medium">{title}</span>
       </div>
-      <p className="mt-1.5 text-[13px] text-warm-grey leading-snug max-w-[420px]">{copy}</p>
+      <p className="mt-1.5 text-[13px] text-muted leading-snug max-w-[420px]">{copy}</p>
     </div>
   );
 }
@@ -267,41 +398,41 @@ function OutputCard({ kicker, title, copy, children, primary = false }: { kicker
 export function OutputsSection() {
   const reality = useDemoReality();
   return (
-    <section className="bg-graphite-0 py-24 md:py-36 overflow-hidden">
-      <div className="px-5 md:px-8">
-        <Reveal>
-          <div className="t-label mb-4">Outputs</div>
-          <h2 className="t-editorial text-ivory" style={{ fontSize: "clamp(32px, 4.5vw, 64px)" }}>
-            NOT A RENDER.
+    <section className="bg-stone py-24 md:py-32 overflow-hidden">
+      <div className="px-5 md:px-10">
+        <Reveal className="max-w-[720px]">
+          <div className="t-label mb-4">Resultados</div>
+          <h2 className="t-display text-ink" style={{ fontSize: "clamp(30px, 4.2vw, 56px)" }}>
+            No es un render.
             <br />
-            YOUR PHOTO, WITH THE PRODUCT IN IT.
+            Tu foto, con el producto dentro.
           </h2>
         </Reveal>
       </div>
-      <div className="mt-12 md:mt-16 flex gap-5 md:gap-8 px-5 md:px-8 overflow-x-auto snap-x snap-mandatory vc-scroll pb-4">
-        <OutputCard kicker="01" title="REALITY" copy="Your photograph, edited: the product installed inside it. Everything else stays exactly as it was. The primary output." primary>
+      <div className="mt-12 md:mt-16 flex gap-5 md:gap-8 px-5 md:px-10 overflow-x-auto snap-x snap-mandatory vc-scroll pb-4">
+        <OutputCard kicker="Principal" title="Realidad" copy="Tu fotografía, editada: el producto instalado dentro de ella. Todo lo demás permanece igual." primary>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           {reality && <img src={reality} alt="" className="absolute inset-0 w-full h-full object-cover" />}
         </OutputCard>
-        <OutputCard kicker="02" title="REAL PLAN" copy="The real photograph with spatial and dimensional information.">
+        <OutputCard kicker="Espacial" title="Plano real" copy="La fotografía real con información de colocación y medidas.">
           <CoverImage
             src={SPACE}
             width={DEMO_SPACE_SIZE.width}
             height={DEMO_SPACE_SIZE.height}
             overlay={(t) => (
-              <RealPlanOverlay footprint={DEMO_PERGOLA_FOOTPRINT} dimensions={DIMS} fovDeg={DEMO_PERGOLA_FOV_DEG} width={DEMO_SPACE_SIZE.width} height={DEMO_SPACE_SIZE.height} t={t} progress={1} productName="Milano X Pergola" />
+              <RealPlanOverlay footprint={DEMO_PERGOLA_FOOTPRINT} dimensions={DIMS} fovDeg={DEMO_PERGOLA_FOV_DEG} width={DEMO_SPACE_SIZE.width} height={DEMO_SPACE_SIZE.height} t={t} progress={1} productName="Pérgola Milano X" />
             )}
           />
         </OutputCard>
-        <OutputCard kicker="03" title="ARCHITECTURE" copy="A more stylised architectural visualization of the same placement. Secondary.">
+        <OutputCard kicker="Secundario" title="Arquitectura" copy="Una visualización arquitectónica más estilizada de la misma colocación.">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={ARCHVIZ} alt="" className="absolute inset-0 w-full h-full object-cover" />
         </OutputCard>
-        <OutputCard kicker="04" title="MOTION" copy="Future video visualization. Coming later.">
+        <OutputCard kicker="Próximamente" title="Movimiento" copy="Visualización en vídeo. Llegará más adelante.">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={SPACE} alt="" className="absolute inset-0 w-full h-full object-cover opacity-30" />
+          <img src={SPACE} alt="" className="absolute inset-0 w-full h-full object-cover opacity-40" />
           <div className="absolute inset-0 flex items-center justify-center">
-            <span className="t-label-strong border border-line-strong px-3 py-1.5 bg-graphite-0/60">Coming later</span>
+            <span className="t-label-strong rounded-full bg-white/95 px-4 py-2 shadow-sm">Próximamente</span>
           </div>
         </OutputCard>
       </div>
@@ -309,23 +440,23 @@ export function OutputsSection() {
   );
 }
 
-// ---------------------------------------------------------------- ABOUT + CTA
+// ---------------------------------------------------------------- NOSOTROS + CIERRE
 
 export function AboutSection() {
   return (
-    <section id="about" className="bg-graphite-1 px-5 md:px-8 py-24 md:py-40">
+    <section id="nosotros" className="bg-paper px-5 md:px-10 py-24 md:py-32">
       <div className="grid md:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] gap-10 md:gap-16 items-end">
         <Reveal>
-          <div className="t-label mb-4">About</div>
-          <h2 className="t-editorial text-ivory" style={{ fontSize: "clamp(32px, 4.8vw, 68px)" }}>
-            WE BUILD THE GAP BETWEEN
+          <div className="t-label mb-4">Nosotros</div>
+          <h2 className="t-display text-ink" style={{ fontSize: "clamp(28px, 4.4vw, 52px)" }}>
+            Construimos el puente entre
             <br />
-            IMAGINATION AND DECISION.
+            la imaginación y la decisión.
           </h2>
         </Reveal>
         <Reveal delay={0.15}>
-          <p className="text-[15px] md:text-[17px] text-ivory/85 leading-snug">
-            VisualClose combines AI, spatial computing and visual technology to change how physical products are presented and sold. A real space, a real product, real dimensions: seen before anything is built.
+          <p className="text-[15px] md:text-[16px] text-ink-2 leading-relaxed">
+            VisualClose combina inteligencia artificial, computación espacial y tecnología visual para cambiar cómo se presentan y se venden los productos físicos. Un espacio real, un producto real, medidas reales: visto antes de construir nada.
           </p>
         </Reveal>
       </div>
@@ -336,20 +467,20 @@ export function AboutSection() {
 export function FooterCta() {
   const go = useCurtainNavigate();
   return (
-    <section className="bg-graphite-0 px-5 md:px-8 pt-24 md:pt-40 pb-10">
-      <Reveal className="hairline-t pt-12 md:pt-20 grid md:grid-cols-[1fr_auto] gap-8 items-end">
-        <h2 className="t-editorial text-ivory" style={{ fontSize: "clamp(40px, 8vw, 120px)" }}>
-          SEE IT.
+    <section className="bg-stone px-5 md:px-10 pt-20 md:pt-28 pb-10">
+      <Reveal className="hairline-t pt-12 md:pt-16 grid md:grid-cols-[1fr_auto] gap-8 items-end">
+        <h2 className="t-display text-ink" style={{ fontSize: "clamp(36px, 7vw, 96px)" }}>
+          Míralo antes
           <br />
-          BEFORE IT EXISTS.
+          de instalarlo.
         </h2>
-        <button type="button" onClick={() => go("/studio")} className="h-12 px-7 text-[11px] tracking-[0.22em] uppercase font-medium text-graphite-0 bg-ivory hover:bg-offwhite transition-colors">
-          Try VisualClose →
+        <button type="button" onClick={() => go("/studio")} className="h-14 px-8 rounded-full text-[13px] font-medium text-white bg-ink hover:bg-ink-2 transition-colors inline-flex items-center gap-2 w-max">
+          Probar VisualClose <span aria-hidden>→</span>
         </button>
       </Reveal>
-      <div className="mt-20 flex items-center justify-between t-label">
+      <div className="mt-16 flex items-center justify-between t-label">
         <span>VISUALCLOSE</span>
-        <span>Demo imagery is placeholder art · Real products · Real spaces</span>
+        <span>Las imágenes de demostración son ilustrativas · Productos reales · Espacios reales</span>
       </div>
     </section>
   );

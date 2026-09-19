@@ -40,7 +40,7 @@ export function DropZone({
         setOver(false);
         accept(e.dataTransfer.files);
       }}
-      className={`cursor-pointer border transition-colors duration-150 ${over ? "border-champagne bg-champagne-soft" : "border-dashed border-line-strong hover:border-ivory/40"} ${compact ? "p-2" : "p-4"} ${className}`}
+      className={`cursor-pointer border transition-colors duration-150 ${over ? "border-accent bg-sand-soft" : "border-dashed border-line-strong hover:border-ink"} ${compact ? "p-2" : "p-4"} ${className}`}
     >
       <input
         ref={inputRef}

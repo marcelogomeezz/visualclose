@@ -48,7 +48,7 @@ export function NumberField({
             if (e.key === "Escape") setText(String(value));
           }}
         />
-        {suffix && <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[11px] text-warm-grey t-mono">{suffix}</span>}
+        {suffix && <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[11px] text-muted t-mono">{suffix}</span>}
       </span>
     </label>
   );

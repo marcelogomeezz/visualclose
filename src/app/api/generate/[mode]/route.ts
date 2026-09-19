@@ -14,7 +14,7 @@ const MODES = new Set(["reality", "archviz", "motion"]);
 
 export async function POST(request: Request, context: { params: Promise<{ mode: string }> }) {
   const { mode } = await context.params;
-  if (!MODES.has(mode)) return NextResponse.json({ error: "Unknown mode" }, { status: 404 });
+  if (!MODES.has(mode)) return NextResponse.json({ error: "Modo desconocido" }, { status: 404 });
   const body = (await request.json()) as GenerateBody;
   try {
     const ai = getAIProvider();
@@ -25,6 +25,6 @@ export async function POST(request: Request, context: { params: Promise<{ mode: 
     const validation = result.kind === "edited-photo" ? await ai.validateResult({ brief, outputAssetUrl: result.assetUrl }) : null;
     return NextResponse.json({ result, brief, validation, provider: gen.id });
   } catch (error) {
-    return NextResponse.json({ error: error instanceof Error ? error.message : "Generation failed" }, { status: 503 });
+    return NextResponse.json({ error: error instanceof Error ? error.message : "La generación ha fallado" }, { status: 503 });
   }
 }

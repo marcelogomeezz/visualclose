@@ -52,39 +52,39 @@ type Style = "reality" | "archviz";
 
 const palette = {
   reality: {
-    skyTop: "#7f97ad",
-    skyBottom: "#d9dcd6",
-    wall: "#d8d2c6",
-    wallShade: "#bfb8ab",
+    skyTop: "#8fa3b8",
+    skyBottom: "#e3ded2",
+    wall: "#e6ddcc",
+    wallShade: "#cfc3ac",
     fascia: "#3a3835",
-    glass: "#2f3b3f",
-    frame: "#26262a",
-    paving: "#a9a49a",
-    pavingLight: "#b9b4aa",
-    lawn: "#6f8a4e",
-    lawnDark: "#55703b",
-    hedge: "#4f6b3c",
-    fence: "#8b7a63",
-    fenceDark: "#6c5d49",
-    tree: "#5b7446",
+    glass: "#33403f",
+    frame: "#2a2a2c",
+    paving: "#c2b9a6",
+    pavingLight: "#d1c8b4",
+    lawn: "#7c9457",
+    lawnDark: "#61793f",
+    hedge: "#5a7245",
+    fence: "#96826a",
+    fenceDark: "#77644e",
+    tree: "#6b8150",
     ao: "#000",
   },
   archviz: {
-    skyTop: "#5a6a86",
-    skyBottom: "#e5c9a4",
-    wall: "#e2d7c4",
-    wallShade: "#c6b8a1",
+    skyTop: "#6b7b93",
+    skyBottom: "#ecd2ab",
+    wall: "#e9dcc8",
+    wallShade: "#cdbda3",
     fascia: "#2e2b28",
     glass: "#4a3d33",
     frame: "#1f1e1e",
-    paving: "#b5aa98",
-    pavingLight: "#c8bda9",
-    lawn: "#78894f",
-    lawnDark: "#5a6d3c",
-    hedge: "#526a3b",
-    fence: "#9a836a",
-    fenceDark: "#75614c",
-    tree: "#5e7443",
+    paving: "#bdaf99",
+    pavingLight: "#cfc0a9",
+    lawn: "#83925a",
+    lawnDark: "#63753f",
+    hedge: "#5c723f",
+    fence: "#a08768",
+    fenceDark: "#7d684f",
+    tree: "#71804c",
     ao: "#2a1a0a",
   },
 } as const;
@@ -116,7 +116,7 @@ function defs(style: Style): string {
     </linearGradient>
     <radialGradient id="vig" cx="0.5" cy="0.5" r="0.75">
       <stop offset="0.55" stop-color="#000" stop-opacity="0"/>
-      <stop offset="1" stop-color="#000" stop-opacity="${style === "archviz" ? 0.42 : 0.28}"/>
+      <stop offset="1" stop-color="#000" stop-opacity="${style === "archviz" ? 0.3 : 0.18}"/>
     </radialGradient>
     <linearGradient id="ao" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="${p.ao}" stop-opacity="0.35"/>
@@ -127,7 +127,7 @@ function defs(style: Style): string {
     <filter id="grain">
       <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/>
       <feColorMatrix type="saturate" values="0"/>
-      <feComponentTransfer><feFuncA type="linear" slope="0.09"/></feComponentTransfer>
+      <feComponentTransfer><feFuncA type="linear" slope="0.055"/></feComponentTransfer>
     </filter>
     ${
       style === "archviz"
@@ -153,9 +153,11 @@ function environment(style: Style): string {
   for (const [x, y, z, r] of canopies) {
     const [cx, cy] = px([x, y, z]);
     const [rx] = px([x + r, y, z]);
-    parts.push(
-      `<ellipse cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" rx="${(rx - cx).toFixed(1)}" ry="${((rx - cx) * 0.8).toFixed(1)}" fill="${p.tree}" opacity="0.85" filter="url(#soft)"/>`,
-    );
+    const rad = rx - cx;
+    // Layered canopy: a darker back mass, the main foliage tone, and a soft sunlit highlight — reads as massed trees, not a flat blob.
+    parts.push(`<ellipse cx="${(cx - rad * 0.16).toFixed(1)}" cy="${(cy + rad * 0.14).toFixed(1)}" rx="${(rad * 1.08).toFixed(1)}" ry="${(rad * 0.86).toFixed(1)}" fill="${p.hedge}" opacity="0.55" filter="url(#soft)"/>`);
+    parts.push(`<ellipse cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" rx="${rad.toFixed(1)}" ry="${(rad * 0.78).toFixed(1)}" fill="${p.tree}" opacity="0.88" filter="url(#soft)"/>`);
+    parts.push(`<ellipse cx="${(cx + rad * 0.24).toFixed(1)}" cy="${(cy - rad * 0.2).toFixed(1)}" rx="${(rad * 0.58).toFixed(1)}" ry="${(rad * 0.44).toFixed(1)}" fill="${p.lawn}" opacity="0.45" filter="url(#soft)"/>`);
   }
   // House rear wall
   const wz = -4.6;
@@ -190,7 +192,12 @@ function environment(style: Style): string {
   parts.push(poly([[-11, 0, wz], [11, 0, wz], [11, 0, wz + 1.4], [-11, 0, wz + 1.4]], `fill="url(#ao)"`));
   // Small planter near the door for scale
   parts.push(box([2.4, 0, -4.1], 0.5, 0.5, 0.55, "#3b3a37", "#2c2b29", "#4a4946"));
-  parts.push(`<ellipse cx="${px([2.65, 0.9, -3.85])[0].toFixed(1)}" cy="${px([2.65, 0.95, -3.85])[1].toFixed(1)}" rx="46" ry="30" fill="${p.tree}" filter="url(#soft2)"/>`);
+  {
+    const [bx, by] = px([2.65, 0.95, -3.85]);
+    parts.push(`<ellipse cx="${(bx - 10).toFixed(1)}" cy="${(by + 6).toFixed(1)}" rx="40" ry="26" fill="${p.hedge}" opacity="0.7" filter="url(#soft2)"/>`);
+    parts.push(`<ellipse cx="${bx.toFixed(1)}" cy="${by.toFixed(1)}" rx="42" ry="27" fill="${p.tree}" opacity="0.92" filter="url(#soft2)"/>`);
+    parts.push(`<ellipse cx="${(bx + 12).toFixed(1)}" cy="${(by - 9).toFixed(1)}" rx="20" ry="13" fill="${p.lawn}" opacity="0.55" filter="url(#soft2)"/>`);
+  }
   return parts.join("\n");
 }
 
@@ -256,7 +263,12 @@ function archvizFurniture(): string {
   parts.push(box([-1.9, 0.42, -1.3], 2.6, 0.25, 0.4, "#c2b6a2", "#ab9f8b", "#cfc4b1"));
   parts.push(box([-0.9, 0, 0.4], 1.2, 0.7, 0.36, "#2a2826", "#1f1e1c", "#3d3a36"));
   parts.push(box([1.6, 0, -1.4], 0.6, 0.6, 0.7, "#3b3936", "#2c2b29", "#4a4946"));
-  parts.push(`<ellipse cx="${px([1.9, 1.0, -1.1])[0].toFixed(1)}" cy="${px([1.9, 1.05, -1.1])[1].toFixed(1)}" rx="70" ry="44" fill="#5b7446" filter="url(#soft2)"/>`);
+  {
+    const [bx, by] = px([1.9, 1.05, -1.1]);
+    parts.push(`<ellipse cx="${(bx - 14).toFixed(1)}" cy="${(by + 8).toFixed(1)}" rx="62" ry="38" fill="${palette.archviz.hedge}" opacity="0.65" filter="url(#soft2)"/>`);
+    parts.push(`<ellipse cx="${bx.toFixed(1)}" cy="${by.toFixed(1)}" rx="66" ry="41" fill="${palette.archviz.tree}" opacity="0.92" filter="url(#soft2)"/>`);
+    parts.push(`<ellipse cx="${(bx + 18).toFixed(1)}" cy="${(by - 12).toFixed(1)}" rx="30" ry="18" fill="${palette.archviz.lawn}" opacity="0.5" filter="url(#soft2)"/>`);
+  }
   // Warm light pool under the roof
   const [cx, cy] = px([0, 0, 0]);
   parts.push(`<ellipse cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" rx="520" ry="150" fill="url(#glow)"/>`);
@@ -274,7 +286,7 @@ export function sceneSvg(kind: "space" | "reality" | "archviz"): string {
   if (kind === "archviz") parts.push(archvizFurniture());
   if (kind !== "space") parts.push(pergola(style, kind === "archviz" ? 0.6 : 0.35));
   parts.push(`<rect width="${IMG_W}" height="${IMG_H}" fill="url(#vig)"/>`);
-  parts.push(`<rect width="${IMG_W}" height="${IMG_H}" filter="url(#grain)" opacity="0.6"/>`);
+  parts.push(`<rect width="${IMG_W}" height="${IMG_H}" filter="url(#grain)" opacity="0.32"/>`);
   parts.push(`</svg>`);
   return parts.join("\n");
 }

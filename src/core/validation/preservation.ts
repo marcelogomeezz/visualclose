@@ -27,7 +27,7 @@ export function comparePreservation(
   const maskThreshold = options.maskThreshold ?? 128;
   const n = width * height;
   if (original.length < n * 4 || edited.length < n * 4 || mask.length < n * 4) {
-    return { outsideChangedRatio: 1, outsideMeanDiff: 255, threshold: maxRatio, passed: false, note: "Buffers do not match the declared size." };
+    return { outsideChangedRatio: 1, outsideMeanDiff: 255, threshold: maxRatio, passed: false, note: "Las imágenes no coinciden con el tamaño declarado." };
   }
   let outside = 0;
   let changed = 0;
@@ -52,6 +52,6 @@ export function comparePreservation(
     outsideMeanDiff: mean,
     threshold: maxRatio,
     passed,
-    note: passed ? "Environment outside the placement region is preserved within tolerance." : "The environment changed outside the placement region. Review windows, doors, floor, plants and background.",
+    note: passed ? "El entorno fuera de la zona de colocación se conserva dentro de la tolerancia." : "El entorno cambió fuera de la zona de colocación. Revisa ventanas, puertas, suelo, plantas y fondo.",
   };
 }

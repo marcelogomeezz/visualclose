@@ -14,7 +14,7 @@ export function pad2(n: number): string {
 
 const TYPE_LABELS: Record<string, string> = {
   ORIGINAL: "ORIGINAL",
-  TECHNICAL: "REAL PLAN",
+  TECHNICAL: "PLANO REAL",
   REALITY: "REALIDAD",
   ARCHVIZ: "ARQUITECTURA",
   MOTION: "MOVIMIENTO",

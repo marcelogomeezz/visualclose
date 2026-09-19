@@ -8,6 +8,6 @@ export async function POST(request: Request) {
     const sceneLock = await getAIProvider().analyzeScene(input);
     return NextResponse.json({ sceneLock, provider: getAIProvider().id });
   } catch (error) {
-    return NextResponse.json({ error: error instanceof Error ? error.message : "Scene analysis failed" }, { status: 503 });
+    return NextResponse.json({ error: error instanceof Error ? error.message : "El análisis del espacio ha fallado" }, { status: 503 });
   }
 }

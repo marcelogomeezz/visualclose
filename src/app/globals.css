@@ -1,50 +1,58 @@
 @import "tailwindcss";
 
+/* VisualClose light system: paper, stone, sand, ink. Photography provides the colour. */
 :root {
-  --graphite-0: #0d0d0d;
-  --graphite-1: #131313;
-  --graphite-2: #181818;
-  --graphite-3: #1f1f1f;
-  --graphite-4: #262626;
-  --line: rgba(236, 230, 218, 0.09);
-  --line-strong: rgba(236, 230, 218, 0.22);
-  --ivory: #ece6da;
-  --offwhite: #f3efe7;
-  --warm-grey: #8d877c;
-  --warm-grey-2: #625d55;
-  --champagne: #c9b48c;
-  --champagne-soft: rgba(201, 180, 140, 0.16);
-  --danger: #b86b5a;
+  --paper: #fbfaf7;
+  --white: #ffffff;
+  --stone: #f1eee8;
+  --stone-2: #e9e5dd;
+  --sand: #e4dccd;
+  --sand-soft: #f4f0e8;
+  --ink: #161616;
+  --ink-2: #2b2a28;
+  --muted: #6f6a62;
+  --muted-2: #9a958c;
+  --line: #e7e2d9;
+  --line-strong: #cfc8bc;
+  --accent: #8a7452;
+  --danger: #b45a4a;
+  --shadow-sm: 0 1px 2px rgba(20, 18, 14, 0.04), 0 4px 14px rgba(20, 18, 14, 0.05);
+  --shadow-md: 0 2px 6px rgba(20, 18, 14, 0.05), 0 14px 40px rgba(20, 18, 14, 0.08);
+  --radius: 14px;
+  --radius-sm: 10px;
   --font-sans: var(--font-geist-sans), "Helvetica Neue", Helvetica, Arial, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, "SF Mono", Menlo, monospace;
 }
 
 @theme inline {
-  --color-graphite-0: var(--graphite-0);
-  --color-graphite-1: var(--graphite-1);
-  --color-graphite-2: var(--graphite-2);
-  --color-graphite-3: var(--graphite-3);
-  --color-graphite-4: var(--graphite-4);
+  --color-paper: var(--paper);
+  --color-stone: var(--stone);
+  --color-stone-2: var(--stone-2);
+  --color-sand: var(--sand);
+  --color-sand-soft: var(--sand-soft);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-muted: var(--muted);
+  --color-muted-2: var(--muted-2);
   --color-line: var(--line);
   --color-line-strong: var(--line-strong);
-  --color-ivory: var(--ivory);
-  --color-offwhite: var(--offwhite);
-  --color-warm-grey: var(--warm-grey);
-  --color-warm-grey-2: var(--warm-grey-2);
-  --color-champagne: var(--champagne);
+  --color-accent: var(--accent);
   --color-danger: var(--danger);
   --font-sans: var(--font-sans);
   --font-mono: var(--font-mono);
+  --shadow-soft: var(--shadow-sm);
+  --shadow-lift: var(--shadow-md);
+  --radius-card: var(--radius);
 }
 
 html,
 body {
   height: 100%;
-  background: var(--graphite-1);
-  color: var(--ivory);
+  background: var(--paper);
+  color: var(--ink);
   font-family: var(--font-sans);
-  font-size: 13px;
-  line-height: 1.4;
+  font-size: 14px;
+  line-height: 1.45;
   -webkit-font-smoothing: antialiased;
   overscroll-behavior: none;
 }
@@ -58,7 +66,7 @@ html {
 }
 
 ::selection {
-  background: rgba(201, 180, 140, 0.35);
+  background: rgba(228, 220, 205, 0.7);
 }
 
 /* Typography utilities */
@@ -66,15 +74,15 @@ html {
   font-size: 10.5px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--warm-grey);
+  color: var(--muted);
   font-weight: 500;
 }
 .t-label-strong {
   font-size: 10.5px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--ivory);
-  font-weight: 500;
+  color: var(--ink);
+  font-weight: 600;
 }
 .t-mono {
   font-family: var(--font-mono);
@@ -82,9 +90,14 @@ html {
   letter-spacing: 0.02em;
 }
 .t-editorial {
-  font-weight: 500;
-  letter-spacing: -0.03em;
+  font-weight: 600;
+  letter-spacing: -0.035em;
   line-height: 0.98;
+}
+.t-display {
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.02;
 }
 
 /* Hairlines */
@@ -101,20 +114,32 @@ html {
   border-left: 1px solid var(--line);
 }
 
+/* Surfaces */
+.card {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+}
+.lift {
+  box-shadow: var(--shadow-md);
+}
+
 /* Inputs */
 .vc-input {
   width: 100%;
-  background: var(--graphite-3);
-  border: 1px solid transparent;
-  color: var(--ivory);
-  padding: 7px 9px;
-  font-size: 12.5px;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  color: var(--ink);
+  padding: 8px 10px;
+  font-size: 13px;
   outline: none;
-  transition: border-color 160ms ease, background 160ms ease;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
 }
 .vc-input:focus {
   border-color: var(--line-strong);
-  background: var(--graphite-4);
+  box-shadow: 0 0 0 3px rgba(228, 220, 205, 0.5);
 }
 .vc-input.mono {
   font-family: var(--font-mono);
@@ -134,37 +159,38 @@ input[type="range"].vc-range {
   -webkit-appearance: none;
   appearance: none;
   width: 100%;
-  height: 16px;
+  height: 18px;
   background: transparent;
 }
 input[type="range"].vc-range::-webkit-slider-runnable-track {
-  height: 1px;
+  height: 2px;
   background: var(--line-strong);
+  border-radius: 2px;
 }
 input[type="range"].vc-range::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 10px;
-  height: 10px;
-  margin-top: -4.5px;
-  background: var(--ivory);
-  border-radius: 0;
+  width: 14px;
+  height: 14px;
+  margin-top: -6px;
+  background: var(--ink);
+  border-radius: 50%;
   cursor: ew-resize;
 }
 input[type="range"].vc-range::-moz-range-track {
-  height: 1px;
+  height: 2px;
   background: var(--line-strong);
 }
 input[type="range"].vc-range::-moz-range-thumb {
-  width: 10px;
-  height: 10px;
-  background: var(--ivory);
+  width: 14px;
+  height: 14px;
+  background: var(--ink);
   border: 0;
-  border-radius: 0;
+  border-radius: 50%;
 }
 
 select.vc-input {
   appearance: none;
-  background-image: linear-gradient(45deg, transparent 50%, var(--warm-grey) 50%), linear-gradient(135deg, var(--warm-grey) 50%, transparent 50%);
+  background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%), linear-gradient(135deg, var(--muted) 50%, transparent 50%);
   background-position: calc(100% - 14px) 55%, calc(100% - 10px) 55%;
   background-size: 4px 4px, 4px 4px;
   background-repeat: no-repeat;
@@ -174,20 +200,21 @@ select.vc-input {
 /* Scrollbars */
 .vc-scroll {
   scrollbar-width: thin;
-  scrollbar-color: var(--graphite-4) transparent;
+  scrollbar-color: var(--line-strong) transparent;
 }
 .vc-scroll::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 .vc-scroll::-webkit-scrollbar-thumb {
-  background: var(--graphite-4);
+  background: var(--line-strong);
+  border-radius: 3px;
 }
 
 /* Focus */
 button:focus-visible,
 [tabindex]:focus-visible {
-  outline: 1px solid var(--champagne);
+  outline: 2px solid rgba(138, 116, 82, 0.5);
   outline-offset: 2px;
 }
 

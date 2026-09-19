@@ -3,8 +3,8 @@
 import { useRef, type PointerEvent as ReactPointerEvent } from "react";
 import { ui, useUI } from "@/state/ui-store";
 
-/** Before / After with identical transforms for both images. The camera never moves here. */
-export function CompareSlider({ beforeUrl, afterUrl, beforeLabel = "Before", afterLabel = "After" }: { beforeUrl: string; afterUrl: string; beforeLabel?: string; afterLabel?: string }) {
+/** Antes / Después with identical transforms for both images. The camera never moves here. */
+export function CompareSlider({ beforeUrl, afterUrl, beforeLabel = "Antes", afterLabel = "Después" }: { beforeUrl: string; afterUrl: string; beforeLabel?: string; afterLabel?: string }) {
   const position = useUI((s) => s.comparePosition);
   const ref = useRef<HTMLDivElement>(null);
   const dragging = useRef(false);
@@ -37,13 +37,14 @@ export function CompareSlider({ beforeUrl, afterUrl, beforeLabel = "Before", aft
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={afterUrl} alt="" className="absolute inset-0 w-full h-full" draggable={false} />
       </div>
-      <div className="absolute top-0 bottom-0 w-px bg-ivory/90 pointer-events-none" style={{ left: `${position * 100}%` }}>
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-7 h-7 border border-ivory/90 bg-graphite-0/70 flex items-center justify-center">
-          <span className="block w-2.5 h-px bg-ivory" />
+      <div className="absolute top-0 bottom-0 w-[2px] bg-white shadow-[0_0_0_1px_rgba(0,0,0,0.06)] pointer-events-none" style={{ left: `${position * 100}%` }}>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white shadow-md flex items-center justify-center gap-0.5">
+          <span className="block w-1 h-2.5 rounded-full bg-ink-2/70" />
+          <span className="block w-1 h-2.5 rounded-full bg-ink-2/70" />
         </div>
       </div>
-      <span className="absolute top-3 left-3 t-label-strong bg-graphite-0/60 px-2 py-1 pointer-events-none">{beforeLabel}</span>
-      <span className="absolute top-3 right-3 t-label-strong bg-graphite-0/60 px-2 py-1 pointer-events-none">{afterLabel}</span>
+      <span className="absolute top-3 left-3 t-label-strong bg-white/95 rounded-full px-3 py-1.5 shadow-sm pointer-events-none">{beforeLabel}</span>
+      <span className="absolute top-3 right-3 t-label-strong bg-white/95 rounded-full px-3 py-1.5 shadow-sm pointer-events-none">{afterLabel}</span>
     </div>
   );
 }
